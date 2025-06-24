@@ -220,6 +220,7 @@ const Inventory = () => {
                                         <motion.button
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
+                                            onClick={() => handleEditItem(item)}
                                             className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                                         >
                                             <Edit className="w-4 h-4" />
