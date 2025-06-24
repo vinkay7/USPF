@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import logo from '../assets/uspf-logo.png'; // Import the USPF logo
 
 const Layout = ({ children, currentPage = 'dashboard' }) => {
     const { user, logout } = useAuth();
