@@ -1,7 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
-from ..models import InventoryItem, User, get_current_user, SAMPLE_INVENTORY
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from models import InventoryItem, User, get_current_user, SAMPLE_INVENTORY
 
 app = FastAPI()
 
