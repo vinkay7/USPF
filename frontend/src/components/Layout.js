@@ -147,12 +147,13 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                     {/* Logo */}
                     <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200">
                         <div className="flex items-center space-x-3">
-                            <div className="relative w-8 h-8 bg-white rounded-full flex items-center justify-center border border-slate-200">
-                                <img 
-                                    src={logo} 
-                                    alt="USPF Logo" 
-                                    className="w-6 h-6 object-contain"
-                                />
+                            <div className="relative">
+                                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-full flex items-center justify-center">
+                                    <Building className="w-4 h-4 text-white" />
+                                </div>
+                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                                    <Shield className="w-2 h-2 text-white" />
+                                </div>
                             </div>
                             <div>
                                 <h1 className="text-sm font-bold text-slate-800">USPF</h1>
