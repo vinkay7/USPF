@@ -77,9 +77,9 @@ const Dashboard = () => {
     ];
 
     const quickActions = [
-        { name: 'Add New Item', icon: Plus, color: 'blue', action: () => console.log('Add item') },
-        { name: 'Scan QR Code', icon: QrCode, color: 'green', action: () => console.log('Scan QR') },
-        { name: 'Create Requisition', icon: FileText, color: 'orange', action: () => console.log('Create requisition') },
+        { name: 'Add New Item', icon: Plus, color: 'blue', action: () => window.location.href = '/inventory' },
+        { name: 'Scan QR Code', icon: QrCode, color: 'green', action: () => window.location.href = '/inventory' },
+        { name: 'Create Requisition', icon: FileText, color: 'orange', action: () => window.location.href = '/requisitions' },
     ];
 
     if (isLoading) {
