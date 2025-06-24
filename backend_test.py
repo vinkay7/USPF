@@ -122,8 +122,8 @@ class USPFInventoryAPITest(unittest.TestCase):
         self.assertTrue(created_item.get("qr_code").startswith("data:image/png;base64,"), "QR code should be a base64 encoded image")
         
         # Store item ID for update test
-        self.item_id = created_item.get("id")
-        print(f"Created inventory item with ID: {self.item_id}")
+        self.__class__.item_id = created_item.get("id")
+        print(f"Created inventory item with ID: {self.__class__.item_id}")
         
         # Verify QR code is valid base64 image
         try:
