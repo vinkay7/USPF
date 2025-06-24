@@ -66,6 +66,12 @@ const Inventory = () => {
         setShowItemModal(true);
     };
 
+    const handleEditItem = (item) => {
+        setSelectedItem(item);
+        // TODO: Implement edit functionality
+        toast.info('Edit functionality coming soon!');
+    };
+
     const handleQRScan = (result) => {
         try {
             const data = JSON.parse(result);
