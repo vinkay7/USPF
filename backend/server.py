@@ -187,8 +187,8 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
 async def login(request: LoginRequest):
     """Authenticate user with hardcoded admin credentials"""
     try:
-        # Hardcoded admin credentials as requested
-        if request.username == "admin" and request.password == "admin":
+        # Hardcoded uspf credentials as requested
+        if request.username == "uspf" and request.password == "uspf":
             # Create a simple token (in production, use proper JWT)
             token = "admin-token"
             
