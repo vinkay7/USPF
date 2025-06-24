@@ -167,13 +167,13 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
     
     # For demo purposes, we'll use a simple token validation
     # In production, you'd validate JWT tokens properly
-    if credentials.credentials == "admin-token":
+    if credentials.credentials == "uspf-token":
         return User(
-            id="admin-001",
-            username="admin",
+            id="uspf-001",
+            username="uspf",
             role="admin",
             department="secretariat",
-            full_name="System Administrator"
+            full_name="USPF Administrator"
         )
     
     raise HTTPException(
