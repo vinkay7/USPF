@@ -313,5 +313,7 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Starting USPF Inventory Management PWA implementation with Supabase backend. User provided Supabase credentials. Will implement authentication, role-based access, and inventory management features."
+  - agent: "main"
+    message: "MAJOR UPDATES COMPLETED: 1) Changed login credentials from admin/admin to uspf/uspf (both backend and frontend), 2) Fixed all button functionalities - Dashboard quick actions now properly navigate to Inventory and Requisitions pages, 3) Fixed Edit button in Inventory component with proper click handler, 4) Fixed navigation bar visibility issue on desktop full screen by separating mobile and desktop sidebar implementations, 5) All services restarted successfully. Ready for user testing."
   - agent: "testing"
     message: "Completed testing of the authentication system. The login functionality with admin/admin credentials is working correctly. The POST /api/auth/login endpoint returns a valid token, and the GET /api/auth/me endpoint correctly returns user information when authenticated. There is a minor issue where the server returns a 500 error instead of a 401 when invalid credentials are provided, but this doesn't affect the core functionality. All authentication endpoints are working as expected."
