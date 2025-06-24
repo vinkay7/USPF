@@ -190,7 +190,7 @@ async def login(request: LoginRequest):
         # Hardcoded uspf credentials as requested
         if request.username == "uspf" and request.password == "uspf":
             # Create a simple token (in production, use proper JWT)
-            token = "admin-token"
+            token = "uspf-token"
             
             user_data = {
                 "id": "uspf-001",
