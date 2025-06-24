@@ -7,6 +7,10 @@
       "config": {
         "distDir": "build"
       }
+    },
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
     }
   ],
   "routes": [
@@ -19,14 +23,5 @@
       "dest": "/frontend/$1"
     }
   ],
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "python3.9"
-    }
-  },
-  "env": {
-    "SUPABASE_URL": "@supabase_url",
-    "SUPABASE_ANON_KEY": "@supabase_anon_key", 
-    "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key"
-  }
+  "outputDirectory": "frontend/build"
 }
