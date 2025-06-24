@@ -64,7 +64,7 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
             <motion.div
                 initial={false}
                 animate={{
-                    x: sidebarOpen ? 0 : '-100%'
+                    x: sidebarOpen || window.innerWidth >= 1024 ? 0 : '-100%'
                 }}
                 className="fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform lg:translate-x-0 lg:static lg:inset-0 border-r border-slate-200"
             >
