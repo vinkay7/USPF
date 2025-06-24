@@ -38,17 +38,14 @@ const Login = () => {
                         initial={{ scale: 0.5, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.2, duration: 0.5 }}
-                        className="mx-auto w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-6 border-4 border-blue-100"
+                        className="mx-auto w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-6 border-4 border-blue-100 overflow-hidden"
                     >
-                        {/* USPF Logo Placeholder */}
-                        <div className="relative">
-                            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-green-600 rounded-full flex items-center justify-center">
-                                <Building className="w-8 h-8 text-white" />
-                            </div>
-                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                                <Shield className="w-3 h-3 text-white" />
-                            </div>
-                        </div>
+                        {/* USPF Logo */}
+                        <img 
+                            src={logo} 
+                            alt="USPF Logo" 
+                            className="w-20 h-20 object-contain"
+                        />
                     </motion.div>
                     <motion.h1
                         initial={{ opacity: 0 }}
