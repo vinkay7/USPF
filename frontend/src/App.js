@@ -2,7 +2,7 @@ import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import AppRouter from './components/Router';
 import './App.css';
 
 const AppContent = () => {
@@ -19,7 +19,7 @@ const AppContent = () => {
     );
   }
 
-  return isAuthenticated ? <Dashboard /> : <Login />;
+  return isAuthenticated ? <AppRouter /> : <Login />;
 };
 
 function App() {
