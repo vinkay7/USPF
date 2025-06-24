@@ -30,8 +30,18 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
     ];
 
     const handleNavigation = (id) => {
-        // In a real app, you'd use React Router here
-        console.log('Navigate to:', id);
+        // Use window.location for navigation to ensure proper routing
+        const routes = {
+            dashboard: '/dashboard',
+            inventory: '/inventory',
+            requisitions: '/requisitions',
+            reports: '/reports',
+            settings: '/settings'
+        };
+        
+        if (routes[id]) {
+            window.location.href = routes[id];
+        }
         setSidebarOpen(false);
     };
 
