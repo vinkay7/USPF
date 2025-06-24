@@ -1,0 +1,7 @@
+fastapi==0.110.1
+supabase>=2.8.1
+qrcode>=7.4.2
+Pillow>=10.0.0
+python-jose>=3.3.0
+pydantic>=2.6.4
+python-dotenv>=1.0.1
