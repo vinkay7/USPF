@@ -31,6 +31,7 @@ class USPFInventoryAPITest(unittest.TestCase):
         """Set up test class - login and get token"""
         cls.token = None
         cls.login_response = None
+        cls.item_id = None  # Initialize item_id at class level
         
         # Test login and get token
         login_data = {
