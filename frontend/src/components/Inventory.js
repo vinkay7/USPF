@@ -68,6 +68,12 @@ const Inventory = () => {
 
     const handleEditItem = (item) => {
         setSelectedItem(item);
+        // TODO: Implement edit functionality - could open edit modal
+        toast.info('Edit functionality - Click "View" to see item details');
+    };
+
+    const handleEditItem = (item) => {
+        setSelectedItem(item);
         // TODO: Implement edit functionality
         toast.info('Edit functionality coming soon!');
     };
