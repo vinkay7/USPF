@@ -61,12 +61,86 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
             </AnimatePresence>
 
             {/* Sidebar */}
+            <div className="hidden lg:flex lg:flex-shrink-0">
+                <div className="w-64 bg-white shadow-lg border-r border-slate-200">
+                    <div className="flex flex-col h-full">
+                        {/* Logo */}
+                        <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200">
+                            <div className="flex items-center space-x-3">
+                                <div className="relative">
+                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-full flex items-center justify-center">
+                                        <Building className="w-4 h-4 text-white" />
+                                    </div>
+                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                                        <Shield className="w-2 h-2 text-white" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h1 className="text-sm font-bold text-slate-800">USPF</h1>
+                                    <p className="text-xs text-slate-500">Inventory</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Navigation */}
+                        <nav className="flex-1 px-4 py-6 space-y-2">
+                            {navigation.map((item) => {
+                                const isActive = currentPage === item.id;
+                                return (
+                                    <motion.button
+                                        key={item.name}
+                                        whileHover={{ x: 4 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={() => handleNavigation(item.id)}
+                                        className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-all ${
+                                            isActive
+                                                ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600'
+                                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                        }`}
+                                    >
+                                        <item.icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : ''}`} />
+                                        <span className="font-medium">{item.name}</span>
+                                    </motion.button>
+                                );
+                            })}
+                        </nav>
+
+                        {/* User info and logout */}
+                        <div className="p-4 border-t border-slate-200">
+                            <div className="flex items-center space-x-3 mb-4">
+                                <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center">
+                                    <User className="w-5 h-5 text-slate-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-slate-900 truncate">
+                                        {user?.full_name || user?.username}
+                                    </p>
+                                    <p className="text-xs text-slate-500 truncate">
+                                        {user?.role} • {user?.department}
+                                    </p>
+                                </div>
+                            </div>
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={logout}
+                                className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                <span>Sign Out</span>
+                            </motion.button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Mobile Sidebar */}
             <motion.div
                 initial={false}
                 animate={{
-                    x: sidebarOpen || window.innerWidth >= 1024 ? 0 : '-100%'
+                    x: sidebarOpen ? 0 : '-100%'
                 }}
-                className="fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform lg:translate-x-0 lg:static lg:inset-0 border-r border-slate-200"
+                className="fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform lg:hidden border-r border-slate-200"
             >
                 <div className="flex flex-col h-full">
                     {/* Logo */}
