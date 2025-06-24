@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Shield, Building } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import logo from '../assets/uspf-logo.png'; // Import the USPF logo
 
 const Login = () => {
     const [formData, setFormData] = useState({
