@@ -1,6 +1,9 @@
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from ..models import LoginRequest, LoginResponse
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from models import LoginRequest, LoginResponse
 
 app = FastAPI()
 
