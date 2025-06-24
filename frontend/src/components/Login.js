@@ -138,15 +138,6 @@ const Login = () => {
                             )}
                         </motion.button>
                     </form>
-
-                    {/* Demo Credentials */}
-                    <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <p className="text-sm text-blue-800 font-medium mb-2">Demo Credentials:</p>
-                        <div className="text-sm text-blue-700">
-                            <p>Username: <code className="bg-blue-100 px-2 py-1 rounded">uspf</code></p>
-                            <p>Password: <code className="bg-blue-100 px-2 py-1 rounded">uspf</code></p>
-                        </div>
-                    </div>
                 </motion.div>
 
                 {/* Footer */}
