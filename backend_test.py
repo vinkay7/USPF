@@ -66,7 +66,7 @@ class USPFInventoryAPITest(unittest.TestCase):
         # Verify user data
         user = self.login_response.get("user")
         self.assertIsNotNone(user, "User data should be returned")
-        self.assertEqual(user.get("username"), "admin", "Username should be 'admin'")
+        self.assertEqual(user.get("username"), "uspf", "Username should be 'uspf'")
         self.assertEqual(user.get("role"), "admin", "Role should be 'admin'")
     
     def test_02_get_current_user(self):
