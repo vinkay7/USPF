@@ -282,6 +282,18 @@ class USPFInventoryAPITest(unittest.TestCase):
                 first_item.get("reorder_level"),
                 "Low stock item quantity should be less than reorder level"
             )
+    
+    def test_11_health_check(self):
+        """Test health check endpoint (no authentication required)"""
+        response = requests.get(f"{BACKEND_URL}/health")
+        
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        
+        health_data = response.json()
+        self.assertIn("status", health_data, "Health check should include status")
+        self.assertEqual(health_data.get("status"), "healthy", "Status should be 'healthy'")
+        self.assertIn("service", health_data, "Health check should include service name")
+        self.assertEqual(health_data.get("service"), "USPF Inventory Management API", "Service name should match")
 
 if __name__ == "__main__":
     # Run the tests
