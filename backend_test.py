@@ -76,7 +76,7 @@ class USPFInventoryAPITest(unittest.TestCase):
         self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
         
         user_data = response.json()
-        self.assertEqual(user_data.get("username"), "admin", "Username should be 'admin'")
+        self.assertEqual(user_data.get("username"), "uspf", "Username should be 'uspf'")
         self.assertEqual(user_data.get("role"), "admin", "Role should be 'admin'")
     
     def test_03_get_inventory(self):
