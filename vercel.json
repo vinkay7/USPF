@@ -15,13 +15,37 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/auth/login",
+      "dest": "/api/auth/login.py"
+    },
+    {
+      "src": "/api/auth/me",
+      "dest": "/api/auth/me.py"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.py"
+    },
+    {
+      "src": "/api/inventory",
+      "dest": "/api/inventory/index.py"
+    },
+    {
+      "src": "/api/dashboard/stats",
+      "dest": "/api/dashboard/stats.py"
+    },
+    {
+      "src": "/api/requisitions",
+      "dest": "/api/requisitions/index.py"
     },
     {
       "src": "/(.*)",
       "dest": "/frontend/$1"
     }
   ],
-  "outputDirectory": "frontend/build"
+  "functions": {
+    "api/**/*.py": {
+      "runtime": "python3.9"
+    }
+  }
 }
