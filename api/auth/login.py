@@ -1,25 +1,27 @@
-from fastapi import FastAPI, HTTPException, status
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import HTTPException, status
+from fastapi.responses import JSONResponse
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models import LoginRequest, LoginResponse
 
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.post("/api/auth/login", response_model=LoginResponse)
-async def login(request: LoginRequest):
-    """Authenticate user with hardcoded admin credentials"""
+def handler(request):
+    """Vercel serverless function handler for login"""
+    if request.method != "POST":
+        return JSONResponse(
+            status_code=405,
+            content={"detail": "Method not allowed"}
+        )
+    
     try:
-        if request.username == "admin" and request.password == "admin":
+        # Parse request body
+        import json
+        body = json.loads(request.body.decode()) if hasattr(request, 'body') else request.get_json()
+        
+        username = body.get("username")
+        password = body.get("password")
+        
+        if username == "admin" and password == "admin":
             token = "admin-token"
             
             user_data = {
@@ -30,22 +32,57 @@ async def login(request: LoginRequest):
                 "full_name": "System Administrator"
             }
             
-            return LoginResponse(
-                success=True,
-                token=token,
-                user=user_data,
-                message="Login successful"
+            response_data = {
+                "success": True,
+                "token": token,
+                "user": user_data,
+                "message": "Login successful"
+            }
+            
+            return JSONResponse(
+                status_code=200,
+                content=response_data,
+                headers={
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+                }
             )
         else:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid username or password"
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Invalid username or password"},
+                headers={
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+                }
             )
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Login failed"
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Login failed"},
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            }
         )
 
-# Export the app as handler for Vercel
-handler = app
+# Handle OPTIONS requests for CORS
+def options_handler():
+    return JSONResponse(
+        status_code=200,
+        content="",
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization"
+        }
+    )
+
+# Main handler that handles both POST and OPTIONS
+def main_handler(request):
+    if request.method == "OPTIONS":
+        return options_handler()
+    return handler(request)
