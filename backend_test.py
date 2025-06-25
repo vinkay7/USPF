@@ -285,7 +285,7 @@ class USPFInventoryAPITest(unittest.TestCase):
     
     def test_11_health_check(self):
         """Test health check endpoint (no authentication required)"""
-        response = requests.get(f"{BACKEND_URL}/health")
+        response = requests.get(f"{API_URL}/health")
         
         self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
         
