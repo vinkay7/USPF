@@ -1,159 +1,145 @@
-from fastapi.responses import JSONResponse
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from models import InventoryItem, generate_qr_code
-from datetime import datetime
+from http.server import BaseHTTPRequestHandler
 import json
 import uuid
+from datetime import datetime
+import qrcode
+import io
+import base64
 
-# Sample inventory data
-SAMPLE_INVENTORY = [
-    {
-        "id": "inv-001",
-        "name": "HP Laptop",
-        "description": "HP EliteBook 840 G8",
-        "category": "Electronics",
-        "quantity": 25,
-        "unit_cost": 150000.0,
-        "reorder_level": 5,
-        "department": "Information Technology Project",
-        "qr_code": "",
-        "created_at": datetime.now().isoformat()
-    },
-    {
-        "id": "inv-002",
-        "name": "Office Chairs",
-        "description": "Ergonomic office chairs",
-        "category": "Furniture",
-        "quantity": 50,
-        "unit_cost": 25000.0,
-        "reorder_level": 10,
-        "department": "Corporate Services",
-        "qr_code": "",
-        "created_at": datetime.now().isoformat()
-    }
-]
-
-def verify_token(request):
-    """Verify authentication token"""
-    auth_header = request.headers.get("Authorization", "")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return False
-    token = auth_header.replace("Bearer ", "")
-    return token == "admin-token"
-
-def handler(request):
-    """Handle inventory operations"""
-    # Verify authentication
-    if not verify_token(request):
-        return JSONResponse(
-            status_code=401,
-            content={"detail": "Authentication required"},
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+class handler(BaseHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        # Sample inventory data
+        self.sample_inventory = [
+            {
+                "id": "inv-001",
+                "name": "HP Laptop",
+                "description": "HP EliteBook 840 G8",
+                "category": "Electronics",
+                "quantity": 25,
+                "unit_cost": 150000.0,
+                "reorder_level": 5,
+                "department": "Information Technology Project",
+                "qr_code": self.generate_qr_code({"id": "inv-001", "name": "HP Laptop"}),
+                "created_at": datetime.now().isoformat()
+            },
+            {
+                "id": "inv-002",
+                "name": "Office Chairs",
+                "description": "Ergonomic office chairs",
+                "category": "Furniture",
+                "quantity": 50,
+                "unit_cost": 25000.0,
+                "reorder_level": 10,
+                "department": "Corporate Services",
+                "qr_code": self.generate_qr_code({"id": "inv-002", "name": "Office Chairs"}),
+                "created_at": datetime.now().isoformat()
             }
-        )
-    
-    if request.method == "GET":
-        return get_inventory()
-    elif request.method == "POST":
-        return create_inventory_item(request)
-    else:
-        return JSONResponse(
-            status_code=405,
-            content={"detail": "Method not allowed"}
-        )
+        ]
+        super().__init__(*args, **kwargs)
 
-def get_inventory():
-    """Get all inventory items"""
-    try:
-        # Generate QR codes for items that don't have them
-        for item in SAMPLE_INVENTORY:
-            if not item.get("qr_code"):
-                item["qr_code"] = generate_qr_code({"id": item["id"], "name": item["name"]})
-        
-        return JSONResponse(
-            status_code=200,
-            content=SAMPLE_INVENTORY,
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "Failed to retrieve inventory"},
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
+    def generate_qr_code(self, data):
+        """Generate QR code for inventory item"""
+        try:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(json.dumps(data))
+            qr.make(fit=True)
+            
+            img = qr.make_image(fill_color="black", back_color="white")
+            img_buffer = io.BytesIO()
+            img.save(img_buffer, format='PNG')
+            img_buffer.seek(0)
+            
+            # Convert to base64
+            img_base64 = base64.b64encode(img_buffer.getvalue()).decode()
+            return f"data:image/png;base64,{img_base64}"
+        except Exception as e:
+            return ""
 
-def create_inventory_item(request):
-    """Create new inventory item"""
-    try:
-        # Parse request body
-        body = json.loads(request.body.decode()) if hasattr(request, 'body') else request.get_json()
-        
-        new_item = {
-            "id": str(uuid.uuid4()),
-            "name": body.get("name"),
-            "description": body.get("description", ""),
-            "category": body.get("category"),
-            "quantity": body.get("quantity", 0),
-            "unit_cost": body.get("unit_cost", 0.0),
-            "reorder_level": body.get("reorder_level", 10),
-            "department": body.get("department"),
-            "qr_code": "",
-            "created_at": datetime.now().isoformat()
-        }
-        
-        # Generate QR code
-        new_item["qr_code"] = generate_qr_code({"id": new_item["id"], "name": new_item["name"]})
-        
-        # Add to inventory (in real app, this would be saved to database)
-        SAMPLE_INVENTORY.append(new_item)
-        
-        return JSONResponse(
-            status_code=201,
-            content=new_item,
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "Failed to create inventory item"},
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
+    def verify_token(self):
+        """Verify authentication token"""
+        auth_header = self.headers.get('Authorization', '')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return False
+        token = auth_header.replace('Bearer ', '')
+        return token == 'admin-token'
 
-# Handle OPTIONS requests for CORS
-def options_handler():
-    return JSONResponse(
-        status_code=200,
-        content="",
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization"
-        }
-    )
+    def do_OPTIONS(self):
+        """Handle CORS preflight requests"""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.end_headers()
 
-# Main handler that handles all methods
-def main_handler(request):
-    if request.method == "OPTIONS":
-        return options_handler()
-    return handler(request)
+    def do_GET(self):
+        """Get all inventory items"""
+        if not self.verify_token():
+            self.send_response(401)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Authentication required"}).encode('utf-8'))
+            return
+
+        try:
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            self.end_headers()
+            self.wfile.write(json.dumps(self.sample_inventory).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Failed to retrieve inventory"}).encode('utf-8'))
+
+    def do_POST(self):
+        """Create new inventory item"""
+        if not self.verify_token():
+            self.send_response(401)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Authentication required"}).encode('utf-8'))
+            return
+
+        try:
+            # Read request body
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+            
+            new_item = {
+                "id": str(uuid.uuid4()),
+                "name": data.get("name"),
+                "description": data.get("description", ""),
+                "category": data.get("category"),
+                "quantity": data.get("quantity", 0),
+                "unit_cost": data.get("unit_cost", 0.0),
+                "reorder_level": data.get("reorder_level", 10),
+                "department": data.get("department"),
+                "qr_code": self.generate_qr_code({"id": str(uuid.uuid4()), "name": data.get("name")}),
+                "created_at": datetime.now().isoformat()
+            }
+            
+            self.send_response(201)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            self.end_headers()
+            self.wfile.write(json.dumps(new_item).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Failed to create inventory item"}).encode('utf-8'))

@@ -1,150 +1,119 @@
-from fastapi.responses import JSONResponse
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from datetime import datetime
+from http.server import BaseHTTPRequestHandler
 import json
 import uuid
+from datetime import datetime
 
-# Sample requisitions data
-SAMPLE_REQUISITIONS = [
-    {
-        "id": "req-001",
-        "item_id": "inv-001",
-        "item_name": "HP Laptop",
-        "department": "Information Technology Project",
-        "requested_quantity": 3,
-        "purpose": "New employee setup",
-        "status": "pending",
-        "requested_by": "John Doe",
-        "approved_by": None,
-        "created_at": datetime.now().isoformat()
-    },
-    {
-        "id": "req-002",
-        "item_id": "inv-002",
-        "item_name": "Office Chairs",
-        "department": "Corporate Services",
-        "requested_quantity": 10,
-        "purpose": "Office expansion",
-        "status": "approved",
-        "requested_by": "Jane Smith",
-        "approved_by": "Admin",
-        "created_at": datetime.now().isoformat()
-    }
-]
-
-def verify_token(request):
-    """Verify authentication token"""
-    auth_header = request.headers.get("Authorization", "")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return False
-    token = auth_header.replace("Bearer ", "")
-    return token == "admin-token"
-
-def handler(request):
-    """Handle requisition operations"""
-    # Verify authentication
-    if not verify_token(request):
-        return JSONResponse(
-            status_code=401,
-            content={"detail": "Authentication required"},
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+class handler(BaseHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        # Sample requisitions data
+        self.sample_requisitions = [
+            {
+                "id": "req-001",
+                "item_id": "inv-001",
+                "item_name": "HP Laptop",
+                "department": "Information Technology Project",
+                "requested_quantity": 3,
+                "purpose": "New employee setup",
+                "status": "pending",
+                "requested_by": "John Doe",
+                "approved_by": None,
+                "created_at": datetime.now().isoformat()
+            },
+            {
+                "id": "req-002",
+                "item_id": "inv-002",
+                "item_name": "Office Chairs",
+                "department": "Corporate Services",
+                "requested_quantity": 10,
+                "purpose": "Office expansion",
+                "status": "approved",
+                "requested_by": "Jane Smith",
+                "approved_by": "Admin",
+                "created_at": datetime.now().isoformat()
             }
-        )
-    
-    if request.method == "GET":
-        return get_requisitions()
-    elif request.method == "POST":
-        return create_requisition(request)
-    else:
-        return JSONResponse(
-            status_code=405,
-            content={"detail": "Method not allowed"}
-        )
+        ]
+        super().__init__(*args, **kwargs)
 
-def get_requisitions():
-    """Get all requisitions"""
-    try:
-        return JSONResponse(
-            status_code=200,
-            content=SAMPLE_REQUISITIONS,
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "Failed to retrieve requisitions"},
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
+    def verify_token(self):
+        """Verify authentication token"""
+        auth_header = self.headers.get('Authorization', '')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return False
+        token = auth_header.replace('Bearer ', '')
+        return token == 'admin-token'
 
-def create_requisition(request):
-    """Create new requisition"""
-    try:
-        # Parse request body
-        body = json.loads(request.body.decode()) if hasattr(request, 'body') else request.get_json()
-        
-        new_requisition = {
-            "id": str(uuid.uuid4()),
-            "item_id": body.get("item_id"),
-            "item_name": body.get("item_name", "Unknown Item"),
-            "department": body.get("department"),
-            "requested_quantity": body.get("requested_quantity"),
-            "purpose": body.get("purpose"),
-            "status": "pending",
-            "requested_by": body.get("requested_by"),
-            "approved_by": None,
-            "created_at": datetime.now().isoformat()
-        }
-        
-        # Add to requisitions (in real app, this would be saved to database)
-        SAMPLE_REQUISITIONS.append(new_requisition)
-        
-        return JSONResponse(
-            status_code=201,
-            content=new_requisition,
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "Failed to create requisition"},
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
+    def do_OPTIONS(self):
+        """Handle CORS preflight requests"""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.end_headers()
 
-# Handle OPTIONS requests for CORS
-def options_handler():
-    return JSONResponse(
-        status_code=200,
-        content="",
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization"
-        }
-    )
+    def do_GET(self):
+        """Get all requisitions"""
+        if not self.verify_token():
+            self.send_response(401)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Authentication required"}).encode('utf-8'))
+            return
 
-# Main handler that handles all methods
-def main_handler(request):
-    if request.method == "OPTIONS":
-        return options_handler()
-    return handler(request)
+        try:
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            self.end_headers()
+            self.wfile.write(json.dumps(self.sample_requisitions).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Failed to retrieve requisitions"}).encode('utf-8'))
+
+    def do_POST(self):
+        """Create new requisition"""
+        if not self.verify_token():
+            self.send_response(401)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Authentication required"}).encode('utf-8'))
+            return
+
+        try:
+            # Read request body
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+            
+            new_requisition = {
+                "id": str(uuid.uuid4()),
+                "item_id": data.get("item_id"),
+                "item_name": data.get("item_name", "Unknown Item"),
+                "department": data.get("department"),
+                "requested_quantity": data.get("requested_quantity"),
+                "purpose": data.get("purpose"),
+                "status": "pending",
+                "requested_by": data.get("requested_by"),
+                "approved_by": None,
+                "created_at": datetime.now().isoformat()
+            }
+            
+            self.send_response(201)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            self.end_headers()
+            self.wfile.write(json.dumps(new_requisition).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Failed to create requisition"}).encode('utf-8'))

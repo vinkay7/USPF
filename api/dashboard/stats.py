@@ -1,92 +1,65 @@
-from fastapi.responses import JSONResponse
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from http.server import BaseHTTPRequestHandler
+import json
 
-def verify_token(request):
-    """Verify authentication token"""
-    auth_header = request.headers.get("Authorization", "")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return False
-    token = auth_header.replace("Bearer ", "")
-    return token == "admin-token"
+class handler(BaseHTTPRequestHandler):
+    def verify_token(self):
+        """Verify authentication token"""
+        auth_header = self.headers.get('Authorization', '')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return False
+        token = auth_header.replace('Bearer ', '')
+        return token == 'admin-token'
 
-def handler(request):
-    """Get dashboard statistics"""
-    if request.method != "GET":
-        return JSONResponse(
-            status_code=405,
-            content={"detail": "Method not allowed"}
-        )
-    
-    # Verify authentication
-    if not verify_token(request):
-        return JSONResponse(
-            status_code=401,
-            content={"detail": "Authentication required"},
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    def do_OPTIONS(self):
+        """Handle CORS preflight requests"""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.end_headers()
+
+    def do_GET(self):
+        """Get dashboard statistics"""
+        if not self.verify_token():
+            self.send_response(401)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Authentication required"}).encode('utf-8'))
+            return
+
+        try:
+            stats = {
+                "total_items": 75,
+                "low_stock_items": 5,
+                "pending_requisitions": 8,
+                "total_value": 4250000.0,
+                "recent_activity": [
+                    {
+                        "type": "stock_received",
+                        "item": "HP Laptop",
+                        "quantity": 10,
+                        "timestamp": "2025-01-27T10:30:00"
+                    },
+                    {
+                        "type": "requisition_approved",
+                        "item": "Office Chairs",
+                        "quantity": 5,
+                        "timestamp": "2025-01-27T09:15:00"
+                    }
+                ]
             }
-        )
-    
-    try:
-        stats = {
-            "total_items": 75,
-            "low_stock_items": 5,
-            "pending_requisitions": 8,
-            "total_value": 4250000.0,
-            "recent_activity": [
-                {
-                    "type": "stock_received",
-                    "item": "HP Laptop",
-                    "quantity": 10,
-                    "timestamp": "2025-01-27T10:30:00"
-                },
-                {
-                    "type": "requisition_approved",
-                    "item": "Office Chairs",
-                    "quantity": 5,
-                    "timestamp": "2025-01-27T09:15:00"
-                }
-            ]
-        }
-        
-        return JSONResponse(
-            status_code=200,
-            content=stats,
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "Failed to retrieve dashboard statistics"},
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
-
-# Handle OPTIONS requests for CORS
-def options_handler():
-    return JSONResponse(
-        status_code=200,
-        content="",
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization"
-        }
-    )
-
-# Main handler that handles both GET and OPTIONS
-def main_handler(request):
-    if request.method == "OPTIONS":
-        return options_handler()
-    return handler(request)
+            
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            self.end_headers()
+            self.wfile.write(json.dumps(stats).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Failed to retrieve dashboard statistics"}).encode('utf-8'))
