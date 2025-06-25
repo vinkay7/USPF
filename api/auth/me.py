@@ -1,86 +1,63 @@
-from fastapi.responses import JSONResponse
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from http.server import BaseHTTPRequestHandler
+import json
 
-def handler(request):
-    """Vercel serverless function handler for getting current user"""
-    if request.method != "GET":
-        return JSONResponse(
-            status_code=405,
-            content={"detail": "Method not allowed"}
-        )
-    
-    try:
-        # Get authorization header
-        auth_header = request.headers.get("Authorization", "")
-        
-        if not auth_header or not auth_header.startswith("Bearer "):
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Authentication required"},
-                headers={
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
-                }
-            )
-        
-        token = auth_header.replace("Bearer ", "")
-        
-        if token == "admin-token":
-            user_data = {
-                "id": "admin-001",
-                "username": "admin",
-                "role": "admin",
-                "department": "secretariat",
-                "full_name": "System Administrator"
-            }
+class handler(BaseHTTPRequestHandler):
+    def do_OPTIONS(self):
+        """Handle CORS preflight requests"""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.end_headers()
+
+    def do_GET(self):
+        """Handle get current user requests"""
+        try:
+            # Get authorization header
+            auth_header = self.headers.get('Authorization', '')
             
-            return JSONResponse(
-                status_code=200,
-                content=user_data,
-                headers={
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            if not auth_header or not auth_header.startswith('Bearer '):
+                self.send_response(401)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+                self.end_headers()
+                self.wfile.write(json.dumps({"detail": "Authentication required"}).encode('utf-8'))
+                return
+            
+            token = auth_header.replace('Bearer ', '')
+            
+            if token == 'admin-token':
+                user_data = {
+                    "id": "admin-001",
+                    "username": "admin",
+                    "role": "admin",
+                    "department": "secretariat",
+                    "full_name": "System Administrator"
                 }
-            )
-        else:
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Invalid authentication credentials"},
-                headers={
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
-                }
-            )
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "Internal server error"},
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            }
-        )
-
-# Handle OPTIONS requests for CORS
-def options_handler():
-    return JSONResponse(
-        status_code=200,
-        content="",
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization"
-        }
-    )
-
-# Main handler that handles both GET and OPTIONS
-def main_handler(request):
-    if request.method == "OPTIONS":
-        return options_handler()
-    return handler(request)
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+                self.end_headers()
+                self.wfile.write(json.dumps(user_data).encode('utf-8'))
+            else:
+                self.send_response(401)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+                self.end_headers()
+                self.wfile.write(json.dumps({"detail": "Invalid authentication credentials"}).encode('utf-8'))
+                
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Internal server error"}).encode('utf-8'))
