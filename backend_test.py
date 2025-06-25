@@ -35,8 +35,8 @@ class USPFInventoryAPITest(unittest.TestCase):
         
         # Test login and get token
         login_data = {
-            "username": "admin",
-            "password": "admin"
+            "username": "uspf",
+            "password": "uspf"
         }
         
         try:
