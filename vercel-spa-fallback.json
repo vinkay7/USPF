@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "buildCommand": "cd frontend && GENERATE_SOURCEMAP=false yarn install && yarn build",
+  "outputDirectory": "frontend/build", 
+  "installCommand": "cd frontend && yarn install",
+  "env": {
+    "GENERATE_SOURCEMAP": "false",
+    "CI": "false",
+    "BABEL_ENV": "production"
+  },
+  "functions": {
+    "api/*.py": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/auth/login",
+      "destination": "/api/auth/login.py"
+    },
+    {
+      "source": "/api/auth/me",
+      "destination": "/api/auth/me.py"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/health.py"
+    },
+    {
+      "source": "/api/inventory",
+      "destination": "/api/inventory/index.py"
+    },
+    {
+      "source": "/api/inventory/create",
+      "destination": "/api/inventory/create.py"
+    },
+    {
+      "source": "/api/inventory/([^/]+)/bin-card",
+      "destination": "/api/inventory/[item_id]/bin-card.py"
+    },
+    {
+      "source": "/api/dashboard/stats",
+      "destination": "/api/dashboard/stats.py"
+    },
+    {
+      "source": "/api/requisitions",
+      "destination": "/api/requisitions/index.py"
+    },
+    {
+      "source": "/api/reports/low-stock",
+      "destination": "/api/reports/low-stock.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ]
+}
