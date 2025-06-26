@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && yarn install && yarn build",
-  "outputDirectory": "frontend/build",
+  "buildCommand": "cd frontend && GENERATE_SOURCEMAP=false yarn install && yarn build",
+  "outputDirectory": "frontend/build", 
   "installCommand": "cd frontend && yarn install",
+  "env": {
+    "GENERATE_SOURCEMAP": "false",
+    "CI": "false",
+    "BABEL_ENV": "production"
+  },
   "functions": {
     "api/auth/login.py": {
       "runtime": "@vercel/python@4.1.0"
