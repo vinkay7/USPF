@@ -22,16 +22,16 @@ class handler(BaseHTTPRequestHandler):
             username = data.get('username')
             password = data.get('password')
             
-            if username == 'admin' and password == 'admin':
+            if username == 'uspf' and password == 'uspf':
                 response_data = {
                     "success": True,
-                    "token": "admin-token",
+                    "token": "uspf-token",
                     "user": {
-                        "id": "admin-001",
-                        "username": "admin",
+                        "id": "uspf-001",
+                        "username": "uspf",
                         "role": "admin",
                         "department": "secretariat",
-                        "full_name": "System Administrator"
+                        "full_name": "USPF Administrator"
                     },
                     "message": "Login successful"
                 }
