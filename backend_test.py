@@ -309,28 +309,5 @@ if __name__ == "__main__":
     print(f"API URL: {API_URL}")
     print("==============================================\n")
     
-    # Create a test suite with the specific tests requested in the review
-    suite = unittest.TestSuite()
-    suite.addTest(USPFInventoryAPITest('test_11_health_check'))  # Health check
-    suite.addTest(USPFInventoryAPITest('test_01_login'))         # Login
-    suite.addTest(USPFInventoryAPITest('test_02_get_current_user'))  # Get current user
-    suite.addTest(USPFInventoryAPITest('test_03_get_inventory'))  # Get inventory
-    suite.addTest(USPFInventoryAPITest('test_09_dashboard_stats'))  # Dashboard stats
-    
-    # Run the tests
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
-    
-    # Print summary
-    print("\n===== TEST RESULTS SUMMARY =====")
-    print(f"Tests run: {result.testsRun}")
-    print(f"Errors: {len(result.errors)}")
-    print(f"Failures: {len(result.failures)}")
-    print(f"Skipped: {len(result.skipped)}")
-    
-    if result.wasSuccessful():
-        print("\n✅ ALL TESTS PASSED - Backend API is working correctly")
-        sys.exit(0)
-    else:
-        print("\n❌ SOME TESTS FAILED - See details above")
-        sys.exit(1)
+    # Run all tests to ensure comprehensive coverage
+    unittest.main(argv=['first-arg-is-ignored'], exit=False)
