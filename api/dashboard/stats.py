@@ -8,7 +8,7 @@ class handler(BaseHTTPRequestHandler):
         if not auth_header or not auth_header.startswith('Bearer '):
             return False
         token = auth_header.replace('Bearer ', '')
-        return token == 'admin-token'
+        return token == 'uspf-token'
 
     def do_OPTIONS(self):
         """Handle CORS preflight requests"""
