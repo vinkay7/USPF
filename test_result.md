@@ -327,6 +327,7 @@ test_plan:
     - "Supabase Integration Setup"
     - "Authentication System"
     - "Login Page with Logo"
+    - "Dashboard Statistics API"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
