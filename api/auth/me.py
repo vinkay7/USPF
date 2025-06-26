@@ -28,13 +28,13 @@ class handler(BaseHTTPRequestHandler):
             
             token = auth_header.replace('Bearer ', '')
             
-            if token == 'admin-token':
+            if token == 'uspf-token':
                 user_data = {
-                    "id": "admin-001",
-                    "username": "admin",
+                    "id": "uspf-001",
+                    "username": "uspf",
                     "role": "admin",
                     "department": "secretariat",
-                    "full_name": "System Administrator"
+                    "full_name": "USPF Administrator"
                 }
                 
                 self.send_response(200)
