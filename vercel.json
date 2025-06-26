@@ -1,51 +1,71 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
-    },
-    {
-      "src": "api/**/*.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/auth/login",
-      "dest": "/api/auth/login.py"
-    },
-    {
-      "src": "/api/auth/me",
-      "dest": "/api/auth/me.py"
-    },
-    {
-      "src": "/api/health",
-      "dest": "/api/health.py"
-    },
-    {
-      "src": "/api/inventory",
-      "dest": "/api/inventory/index.py"
-    },
-    {
-      "src": "/api/dashboard/stats",
-      "dest": "/api/dashboard/stats.py"
-    },
-    {
-      "src": "/api/requisitions",
-      "dest": "/api/requisitions/index.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
-    }
-  ],
+  "buildCommand": "cd frontend && yarn install && yarn build",
+  "outputDirectory": "frontend/build",
+  "installCommand": "cd frontend && yarn install",
   "functions": {
-    "api/**/*.py": {
+    "api/auth/login.py": {
+      "runtime": "python3.9"
+    },
+    "api/auth/me.py": {
+      "runtime": "python3.9"
+    },
+    "api/health.py": {
+      "runtime": "python3.9"
+    },
+    "api/inventory/index.py": {
+      "runtime": "python3.9"
+    },
+    "api/dashboard/stats.py": {
+      "runtime": "python3.9"
+    },
+    "api/requisitions/index.py": {
       "runtime": "python3.9"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/auth/login",
+      "destination": "/api/auth/login.py"
+    },
+    {
+      "source": "/api/auth/me",
+      "destination": "/api/auth/me.py"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/health.py"
+    },
+    {
+      "source": "/api/inventory",
+      "destination": "/api/inventory/index.py"
+    },
+    {
+      "source": "/api/dashboard/stats",
+      "destination": "/api/dashboard/stats.py"
+    },
+    {
+      "source": "/api/requisitions",
+      "destination": "/api/requisitions/index.py"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ]
 }
