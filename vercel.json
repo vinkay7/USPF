@@ -9,23 +9,9 @@
     "BABEL_ENV": "production"
   },
   "functions": {
-    "api/auth/login.py": {
-      "runtime": "@vercel/python@4.1.0"
-    },
-    "api/auth/me.py": {
-      "runtime": "@vercel/python@4.1.0"
-    },
-    "api/health.py": {
-      "runtime": "@vercel/python@4.1.0"
-    },
-    "api/inventory/index.py": {
-      "runtime": "@vercel/python@4.1.0"
-    },
-    "api/dashboard/stats.py": {
-      "runtime": "@vercel/python@4.1.0"
-    },
-    "api/requisitions/index.py": {
-      "runtime": "@vercel/python@4.1.0"
+    "api/*.py": {
+      "memory": 1024,
+      "maxDuration": 30
     }
   },
   "rewrites": [
