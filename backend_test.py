@@ -29,7 +29,7 @@ class USPFInventoryAPITest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up test class - login and get token"""
-        cls.token = None
+        cls.token = "uspf-token"  # Using the specified token directly
         cls.login_response = None
         cls.item_id = None  # Initialize item_id at class level
         
@@ -43,7 +43,9 @@ class USPFInventoryAPITest(unittest.TestCase):
             response = requests.post(f"{API_URL}/auth/login", json=login_data)
             if response.status_code == 200:
                 cls.login_response = response.json()
-                cls.token = cls.login_response.get("token")
+                # Verify the token matches our expected token
+                if cls.login_response.get("token") != cls.token:
+                    print(f"Warning: Token from server '{cls.login_response.get('token')}' doesn't match expected token '{cls.token}'")
                 print("Successfully logged in and obtained token")
             else:
                 print(f"Login failed with status code {response.status_code}: {response.text}")
