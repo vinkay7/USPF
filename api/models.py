@@ -137,7 +137,7 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
             detail="Authentication required"
         )
     
-    if credentials.credentials == "admin-token":
+    if credentials.credentials == "uspf-token":
         return User(
             id="admin-001",
             username="admin",
