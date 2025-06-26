@@ -5,22 +5,22 @@
   "installCommand": "cd frontend && yarn install",
   "functions": {
     "api/auth/login.py": {
-      "runtime": "python3.9"
+      "runtime": "@vercel/python@4.1.0"
     },
     "api/auth/me.py": {
-      "runtime": "python3.9"
+      "runtime": "@vercel/python@4.1.0"
     },
     "api/health.py": {
-      "runtime": "python3.9"
+      "runtime": "@vercel/python@4.1.0"
     },
     "api/inventory/index.py": {
-      "runtime": "python3.9"
+      "runtime": "@vercel/python@4.1.0"
     },
     "api/dashboard/stats.py": {
-      "runtime": "python3.9"
+      "runtime": "@vercel/python@4.1.0"
     },
     "api/requisitions/index.py": {
-      "runtime": "python3.9"
+      "runtime": "@vercel/python@4.1.0"
     }
   },
   "rewrites": [
