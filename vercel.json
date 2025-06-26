@@ -40,8 +40,8 @@
       "destination": "/api/requisitions/index.py"
     },
     {
-      "source": "/(.*)",
-      "destination": "/$1"
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
