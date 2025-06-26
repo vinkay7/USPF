@@ -137,6 +137,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Verified login functionality with admin/admin credentials. POST /api/auth/login returns success:true and a valid token. GET /api/auth/me correctly returns user information when authenticated with the token. All authentication endpoints are working properly. Minor issue: server returns 500 instead of 401 for invalid credentials, but this doesn't affect core functionality."
+      - working: true
+        agent: "testing"
+        comment: "Verified login functionality with uspf/uspf credentials. POST /api/auth/login returns success:true and the token 'uspf-token'. GET /api/auth/me correctly returns user information when authenticated with the token. All authentication endpoints are working properly with 200 status codes."
 
   - task: "Role-Based Access Control"
     implemented: true
