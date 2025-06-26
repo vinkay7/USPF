@@ -204,6 +204,21 @@ backend:
         agent: "testing"
         comment: "QR code generation working perfectly, producing valid base64 encoded images"
 
+  - task: "Dashboard Statistics API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "API for dashboard statistics and metrics"
+      - working: true
+        agent: "testing"
+        comment: "Verified GET /api/dashboard/stats endpoint returns dashboard statistics with 200 status code. The response includes total_items, total_value, low_stock_count, pending_requisitions, and recent_activities. The endpoint requires authentication and works properly with the 'uspf-token'."
+
 frontend:
   - task: "Login Page with Logo"
     implemented: false
