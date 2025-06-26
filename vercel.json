@@ -32,12 +32,24 @@
       "destination": "/api/inventory/index.py"
     },
     {
+      "source": "/api/inventory/create",
+      "destination": "/api/inventory/create.py"
+    },
+    {
+      "source": "/api/inventory/([^/]+)/bin-card",
+      "destination": "/api/inventory/[item_id]/bin-card.py"
+    },
+    {
       "source": "/api/dashboard/stats",
       "destination": "/api/dashboard/stats.py"
     },
     {
       "source": "/api/requisitions",
       "destination": "/api/requisitions/index.py"
+    },
+    {
+      "source": "/api/reports/low-stock",
+      "destination": "/api/reports/low-stock.py"
     },
     {
       "source": "/((?!api/).*)",
