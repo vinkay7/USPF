@@ -118,21 +118,31 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
     // Sidebar Component (Shared)
     const SidebarContent = ({ isMobile = false }) => (
         <div className="flex flex-col h-full">
-            {/* Logo */}
+            {/* Enhanced Logo */}
             <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 neumorphic bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <div className={`relative neumorphic p-2 rounded-xl ${
+                        darkMode ? 'bg-slate-700' : 'bg-white'
+                    }`}
+                    style={{
+                        boxShadow: `
+                            0 8px 16px rgba(59, 130, 246, 0.1),
+                            0 4px 8px rgba(34, 197, 94, 0.05),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                            inset 0 -1px 0 rgba(59, 130, 246, 0.05)
+                        `
+                    }}>
                         <img 
-                            src="/uspf-logo.png" 
+                            src="/uspf-logo.svg" 
                             alt="USPF Logo" 
-                            className="w-8 h-8 object-contain"
+                            className="w-10 h-10 object-contain"
                             onError={(e) => {
                                 e.target.style.display = 'none';
                                 e.target.nextSibling.style.display = 'flex';
                             }}
                         />
-                        <div className="hidden w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-full items-center justify-center">
-                            <span className="text-white font-bold text-xs">USPF</span>
+                        <div className="hidden w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg items-center justify-center">
+                            <span className="text-white font-bold text-sm">USPF</span>
                         </div>
                     </div>
                     <div>
@@ -204,6 +214,103 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
         </div>
     );
 
+    // Enhanced Mobile Sidebar with USPF Logo
+    const MobileSidebarContent = () => (
+        <div className="flex flex-col h-full">
+            {/* Enhanced Mobile Logo */}
+            <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex items-center space-x-3">
+                    <div className={`relative neumorphic p-2 rounded-xl ${
+                        darkMode ? 'bg-slate-700' : 'bg-white'
+                    }`}
+                    style={{
+                        boxShadow: `
+                            0 6px 12px rgba(59, 130, 246, 0.08),
+                            0 3px 6px rgba(34, 197, 94, 0.04),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                            inset 0 -1px 0 rgba(59, 130, 246, 0.05)
+                        `
+                    }}>
+                        <img 
+                            src="/uspf-logo.svg" 
+                            alt="USPF Logo" 
+                            className="w-8 h-8 object-contain"
+                            onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                            }}
+                        />
+                        <div className="hidden w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg items-center justify-center">
+                            <span className="text-white font-bold text-xs">USPF</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 className="text-sm font-bold text-slate-800 dark:text-white">USPF</h1>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Inventory</p>
+                    </div>
+                </div>
+                <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="lg:hidden p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                >
+                    <X className="w-5 h-5" />
+                </button>
+            </div>
+
+            {/* Mobile Navigation */}
+            <nav className="flex-1 px-4 py-6 space-y-2">
+                {navigation.map((item) => {
+                    const isActive = currentPage === item.id;
+                    return (
+                        <motion.button
+                            key={item.name}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handleNavigation(item.id)}
+                            className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-xl transition-all ${
+                                isActive
+                                    ? 'neumorphic-inset bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg'
+                                    : 'neumorphic text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white/50 dark:bg-slate-800/30'
+                            }`}
+                        >
+                            <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : ''}`} />
+                            <span className="font-medium">{item.name}</span>
+                        </motion.button>
+                    );
+                })}
+            </nav>
+
+            {/* Mobile User Profile Card */}
+            <div className="p-4 border-t border-slate-200 dark:border-slate-700">
+                <div className="floating-card p-4 mb-4">
+                    <div className="flex items-center space-x-3 mb-3">
+                        <div className="w-12 h-12 neumorphic bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
+                            <User className="w-6 h-6 text-slate-600 dark:text-slate-300" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                                {user?.full_name || user?.username}
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                                {user?.role} • {user?.department}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={logout}
+                    className="w-full neumorphic bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-xl px-4 py-3 flex items-center space-x-2 transition-all"
+                >
+                    <LogOut className="w-4 h-4" />
+                    <span className="font-medium">Sign Out</span>
+                </motion.button>
+            </div>
+        </div>
+    );
+
     return (
         <div className={`h-screen ${darkMode ? 'dark' : ''}`}>
             <div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-green-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-slate-800 flex overflow-hidden transition-all duration-500">
@@ -237,7 +344,7 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                     className="fixed inset-y-0 left-0 z-30 w-64 transform lg:hidden"
                 >
                     <div className="floating-card h-full m-4">
-                        <SidebarContent isMobile={true} />
+                        <MobileSidebarContent />
                     </div>
                 </motion.div>
 

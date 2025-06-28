@@ -159,16 +159,26 @@ const Login = () => {
               className="w-full max-w-md"
             >
               
-              {/* Logo */}
+              {/* Enhanced Logo */}
               <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="text-center mb-8"
               >
-                <div className="mx-auto w-20 h-20 neumorphic bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm rounded-full flex items-center justify-center mb-6">
+                <div className={`mx-auto w-20 h-20 rounded-full shadow-xl flex items-center justify-center mb-6 overflow-hidden neumorphic ${
+                  darkMode ? 'bg-slate-800' : 'bg-white'
+                }`}
+                style={{
+                  boxShadow: `
+                    0 10px 25px rgba(59, 130, 246, 0.15),
+                    0 5px 15px rgba(34, 197, 94, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                    inset 0 -1px 0 rgba(59, 130, 246, 0.1)
+                  `
+                }}>
                   <img 
-                    src="/uspf-logo.png" 
+                    src="/uspf-logo.svg" 
                     alt="USPF Logo" 
                     className="w-16 h-16 object-contain"
                     onError={(e) => {
