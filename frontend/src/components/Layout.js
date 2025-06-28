@@ -318,7 +318,7 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                             </div>
 
                             {/* Profile Avatar Dropdown */}
-                            <div className="relative">
+                            <div className="relative profile-dropdown">
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
