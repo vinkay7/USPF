@@ -168,7 +168,7 @@ const Login = () => {
               >
                 <div className="mx-auto w-20 h-20 neumorphic bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm rounded-full flex items-center justify-center mb-6">
                   <img 
-                    src="/src/assets/uspf-logo.png" 
+                    src="/uspf-logo.png" 
                     alt="USPF Logo" 
                     className="w-16 h-16 object-contain"
                     onError={(e) => {

@@ -109,7 +109,7 @@ const SplashScreen = ({ onComplete }) => {
             {/* Main logo container */}
             <div className="relative w-32 h-32 bg-white rounded-full shadow-2xl flex items-center justify-center border-4 border-blue-100">
               <img 
-                src="/src/assets/uspf-logo.png" 
+                src="/uspf-logo.png" 
                 alt="USPF Logo" 
                 className="w-24 h-24 object-contain"
                 onError={(e) => {

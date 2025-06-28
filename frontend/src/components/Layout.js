@@ -123,7 +123,7 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                 <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 neumorphic bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm rounded-full flex items-center justify-center">
                         <img 
-                            src="/src/assets/uspf-logo.png" 
+                            src="/uspf-logo.png" 
                             alt="USPF Logo" 
                             className="w-8 h-8 object-contain"
                             onError={(e) => {
