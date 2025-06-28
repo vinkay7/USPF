@@ -357,6 +357,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Integrated official USPF logo across all components following design system specifications: splash screen (center stage with large size and dramatic animation), login page (elegant circular container above form), sidebar desktop/mobile (professional placement with brand text), all with consistent neumorphic container treatment and fallback text logo"
+      - working: "NA"
+        agent: "main"
+        comment: "USPF LOGO UPDATE COMPLETED: Downloaded official USPF logo from https://www.uspf.gov.ng/images/logos/USPF_logo.svg and integrated into splash screen with enhanced sizing (32x32/128px), improved drop shadows, and enhanced glow effects that complement USPF blue and green colors. Updated all components (SplashScreen, Login, Layout) to use SVG logo from public assets for optimal loading. Added decorative rings, enhanced neumorphic shadows, and USPF brand color gradients throughout logo displays."
 
   - task: "PWA Configuration"
     implemented: false
