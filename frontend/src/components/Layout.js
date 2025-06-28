@@ -25,6 +25,21 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
     const [notificationOpen, setNotificationOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
 
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest('.notification-dropdown')) {
+                setNotificationOpen(false);
+            }
+            if (!event.target.closest('.profile-dropdown')) {
+                setProfileOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     // Dark mode persistence
     useEffect(() => {
         const saved = localStorage.getItem('uspf_dark_mode');
