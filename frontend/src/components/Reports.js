@@ -40,30 +40,75 @@ const Reports = () => {
             setLowStockItems(lowStockResponse.data);
             setDashboardStats(statsResponse.data);
         } catch (error) {
-            toast.error('Failed to fetch reports data');
             console.error('Reports fetch error:', error);
+            toast.error('Failed to fetch reports data');
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleDownloadReport = (type) => {
-        // In a real application, this would generate and download actual reports
-        toast.success(`${type} report download started`);
-    };
-
     const reportTypes = [
         { id: 'overview', name: 'Overview', icon: BarChart3 },
-        { id: 'inventory', name: 'Inventory Status', icon: Package },
-        { id: 'low-stock', name: 'Low Stock Alert', icon: AlertTriangle },
-        { id: 'activity', name: 'Activity Log', icon: FileText }
+        { id: 'low-stock', name: 'Low Stock', icon: AlertTriangle },
+        { id: 'inventory', name: 'Inventory', icon: Package },
+        { id: 'activity', name: 'Activity Log', icon: Calendar }
     ];
+
+    const handleDownloadReport = (type) => {
+        const csvData = generateCSVData(type);
+        downloadCSV(csvData, `${type}-report-${new Date().toISOString().split('T')[0]}.csv`);
+        toast.success(`${type} report exported successfully`);
+    };
+
+    const generateCSVData = (type) => {
+        switch (type) {
+            case 'low-stock':
+                return [
+                    ['Item Name', 'Category', 'Current Stock', 'Reorder Level', 'Department'],
+                    ...lowStockItems.map(item => [
+                        item.name,
+                        item.category,
+                        item.quantity,
+                        item.reorder_level,
+                        item.department
+                    ])
+                ];
+            case 'comprehensive':
+                return [
+                    ['Report Type', 'Total Items', 'Total Value', 'Low Stock Count', 'Last Updated'],
+                    ['Comprehensive Report', dashboardStats?.total_items || 0, dashboardStats?.total_value || 0, dashboardStats?.low_stock_count || 0, new Date().toISOString()]
+                ];
+            default:
+                return [['No data available']];
+        }
+    };
+
+    const downloadCSV = (data, filename) => {
+        const csvContent = data.map(row => row.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
 
     if (isLoading) {
         return (
             <Layout currentPage="reports">
                 <div className="flex items-center justify-center h-64">
-                    <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="text-center">
+                        <div className="relative mx-auto w-16 h-16 mb-4">
+                            <div className="absolute inset-0 border-4 border-blue-200 dark:border-blue-800 rounded-full"></div>
+                            <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                        <p className="text-slate-600 dark:text-slate-300 font-medium">Loading reports...</p>
+                    </div>
                 </div>
             </Layout>
         );
@@ -73,17 +118,26 @@ const Reports = () => {
         <Layout currentPage="reports">
             <div className="space-y-6">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900 mb-2">Reports & Analytics</h1>
-                        <p className="text-slate-600">Comprehensive inventory insights and reports</p>
+                        <h1 className="text-4xl font-bold gradient-text mb-2">Reports & Analytics</h1>
+                        <p className="text-slate-600 dark:text-slate-300">Generate comprehensive inventory reports</p>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handleDownloadReport('low-stock')}
+                            className="neumorphic-button px-4 py-2 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-xl flex items-center space-x-2"
+                        >
+                            <Download className="w-4 h-4" />
+                            <span>Export Low Stock</span>
+                        </motion.button>
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => handleDownloadReport('comprehensive')}
-                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            className="neumorphic-button px-4 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl flex items-center space-x-2"
                         >
                             <Download className="w-4 h-4" />
                             <span>Export Report</span>
@@ -92,7 +146,7 @@ const Reports = () => {
                 </div>
 
                 {/* Report Type Selector */}
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                <div className="floating-card p-4">
                     <div className="flex flex-wrap gap-2">
                         {reportTypes.map((type) => {
                             const IconComponent = type.icon;
@@ -102,10 +156,10 @@ const Reports = () => {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={() => setReportType(type.id)}
-                                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                                    className={`neumorphic flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                                         reportType === type.id
-                                            ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                                            : 'text-slate-600 hover:bg-slate-50 border border-transparent'
+                                            ? 'bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg'
+                                            : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white/50 dark:bg-slate-800/30'
                                     }`}
                                 >
                                     <IconComponent className="w-4 h-4" />
@@ -122,7 +176,7 @@ const Reports = () => {
                 )}
 
                 {reportType === 'low-stock' && (
-                    <LowStockReport items={lowStockItems} />
+                    <LowStockReport items={lowStockItems} onExport={() => handleDownloadReport('low-stock')} />
                 )}
 
                 {reportType === 'inventory' && (
@@ -180,63 +234,63 @@ const OverviewReport = ({ stats }) => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
+                        className="floating-card p-6"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-medium text-slate-600">{metric.label}</h3>
+                            <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">{metric.label}</h3>
                             <div className={`text-sm ${
-                                metric.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                                metric.trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                             }`}>
                                 {metric.change}
                             </div>
                         </div>
-                        <p className="text-2xl font-bold text-slate-900">{metric.value}</p>
+                        <p className="text-2xl font-bold text-slate-900 dark:text-white">{metric.value}</p>
                     </motion.div>
                 ))}
             </div>
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Monthly Overview</h3>
+                <div className="floating-card p-6">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Monthly Overview</h3>
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Items Added</span>
-                            <span className="font-semibold text-slate-900">25</span>
+                            <span className="text-slate-600 dark:text-slate-400">Items Added</span>
+                            <span className="font-semibold text-slate-900 dark:text-white">25</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Items Issued</span>
-                            <span className="font-semibold text-slate-900">180</span>
+                            <span className="text-slate-600 dark:text-slate-400">Items Issued</span>
+                            <span className="font-semibold text-slate-900 dark:text-white">180</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Items Received</span>
-                            <span className="font-semibold text-slate-900">95</span>
+                            <span className="text-slate-600 dark:text-slate-400">Items Received</span>
+                            <span className="font-semibold text-slate-900 dark:text-white">95</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Total Transactions</span>
-                            <span className="font-semibold text-slate-900">300</span>
+                            <span className="text-slate-600 dark:text-slate-400">Total Transactions</span>
+                            <span className="font-semibold text-slate-900 dark:text-white">300</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Department Activity</h3>
+                <div className="floating-card p-6">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Department Activity</h3>
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600">IT Project</span>
-                            <span className="font-semibold text-slate-900">45 requests</span>
+                            <span className="text-slate-600 dark:text-slate-400">IT Project</span>
+                            <span className="font-semibold text-slate-900 dark:text-white">45 requests</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Corporate Services</span>
-                            <span className="font-semibold text-slate-900">32 requests</span>
+                            <span className="text-slate-600 dark:text-slate-400">Corporate Services</span>
+                            <span className="font-semibold text-slate-900 dark:text-white">32 requests</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Procurement</span>
-                            <span className="font-semibold text-slate-900">28 requests</span>
+                            <span className="text-slate-600 dark:text-slate-400">Procurement</span>
+                            <span className="font-semibold text-slate-900 dark:text-white">28 requests</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Others</span>
-                            <span className="font-semibold text-slate-900">15 requests</span>
+                            <span className="text-slate-600 dark:text-slate-400">Others</span>
+                            <span className="font-semibold text-slate-900 dark:text-white">15 requests</span>
                         </div>
                     </div>
                 </div>
@@ -246,20 +300,20 @@ const OverviewReport = ({ stats }) => {
 };
 
 // Low Stock Report Component
-const LowStockReport = ({ items }) => {
+const LowStockReport = ({ items, onExport }) => {
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-            <div className="p-6 border-b border-slate-200">
+        <div className="floating-card">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="text-lg font-semibold text-slate-900">Low Stock Alert Report</h3>
-                        <p className="text-slate-600 mt-1">{items.length} items below reorder level</p>
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Low Stock Alert Report</h3>
+                        <p className="text-slate-600 dark:text-slate-400 mt-1">{items.length} items below reorder level</p>
                     </div>
                     <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => toast.success('Low stock report exported')}
-                        className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        onClick={onExport}
+                        className="neumorphic-button px-4 py-2 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg flex items-center space-x-2"
                     >
                         <Download className="w-4 h-4" />
                         <span>Export Alert</span>
@@ -276,29 +330,31 @@ const LowStockReport = ({ items }) => {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                className="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded-lg"
+                                className="neumorphic-inset p-4 rounded-lg bg-red-50/50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
                             >
-                                <div className="flex items-center space-x-4">
-                                    <div className="p-2 bg-red-100 rounded-lg">
-                                        <AlertTriangle className="w-5 h-5 text-red-600" />
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="p-2 neumorphic bg-red-100 dark:bg-red-900/30 rounded-lg">
+                                            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-slate-900 dark:text-white">{item.name}</h4>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400">{item.category} • {item.department}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h4 className="font-semibold text-slate-900">{item.name}</h4>
-                                        <p className="text-sm text-slate-600">{item.category} • {item.department}</p>
+                                    <div className="text-right">
+                                        <p className="font-semibold text-red-700 dark:text-red-400">Stock: {item.quantity}</p>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400">Reorder: {item.reorder_level}</p>
                                     </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="font-semibold text-red-700">Stock: {item.quantity}</p>
-                                    <p className="text-sm text-slate-600">Reorder: {item.reorder_level}</p>
                                 </div>
                             </motion.div>
                         ))}
                     </div>
                 ) : (
                     <div className="text-center py-8">
-                        <Package className="w-16 h-16 text-green-300 mx-auto mb-4" />
-                        <h4 className="text-lg font-medium text-slate-900 mb-2">All Stock Levels Good</h4>
-                        <p className="text-slate-600">No items are currently below reorder levels</p>
+                        <Package className="w-16 h-16 text-green-300 dark:text-green-600 mx-auto mb-4" />
+                        <h4 className="text-lg font-medium text-slate-900 dark:text-white mb-2">All Stock Levels Good</h4>
+                        <p className="text-slate-600 dark:text-slate-400">No items are currently below reorder levels</p>
                     </div>
                 )}
             </div>
@@ -309,29 +365,29 @@ const LowStockReport = ({ items }) => {
 // Inventory Report Component
 const InventoryReport = () => {
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-6">Inventory Status Report</h3>
+        <div className="floating-card p-6">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">Inventory Status Report</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center p-6 bg-blue-50 rounded-lg border border-blue-200">
-                    <Package className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                    <h4 className="text-lg font-semibold text-slate-900 mb-1">Electronics</h4>
-                    <p className="text-2xl font-bold text-blue-600">45 items</p>
-                    <p className="text-sm text-slate-600 mt-1">₦2,250,000 value</p>
+                <div className="neumorphic-inset text-center p-6 bg-blue-50/50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <Package className="w-12 h-12 text-blue-600 dark:text-blue-400 mx-auto mb-3" />
+                    <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Electronics</h4>
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">45 items</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">₦2,250,000 value</p>
                 </div>
 
-                <div className="text-center p-6 bg-green-50 rounded-lg border border-green-200">
-                    <Package className="w-12 h-12 text-green-600 mx-auto mb-3" />
-                    <h4 className="text-lg font-semibold text-slate-900 mb-1">Furniture</h4>
-                    <p className="text-2xl font-bold text-green-600">78 items</p>
-                    <p className="text-sm text-slate-600 mt-1">₦1,950,000 value</p>
+                <div className="neumorphic-inset text-center p-6 bg-green-50/50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <Package className="w-12 h-12 text-green-600 dark:text-green-400 mx-auto mb-3" />
+                    <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Furniture</h4>
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">78 items</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">₦1,950,000 value</p>
                 </div>
 
-                <div className="text-center p-6 bg-orange-50 rounded-lg border border-orange-200">
-                    <Package className="w-12 h-12 text-orange-600 mx-auto mb-3" />
-                    <h4 className="text-lg font-semibold text-slate-900 mb-1">Consumables</h4>
-                    <p className="text-2xl font-bold text-orange-600">27 items</p>
-                    <p className="text-sm text-slate-600 mt-1">₦800,000 value</p>
+                <div className="neumorphic-inset text-center p-6 bg-orange-50/50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                    <Package className="w-12 h-12 text-orange-600 dark:text-orange-400 mx-auto mb-3" />
+                    <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Consumables</h4>
+                    <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">27 items</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">₦800,000 value</p>
                 </div>
             </div>
         </div>
@@ -343,14 +399,14 @@ const ActivityReport = ({ stats }) => {
     const activities = stats?.recent_activities || [];
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="floating-card p-6">
             <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-slate-900">Recent Activity Log</h3>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Activity Log</h3>
                 <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => toast.success('Activity log exported')}
-                    className="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
+                    className="neumorphic-button px-4 py-2 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-lg flex items-center space-x-2"
                 >
                     <Download className="w-4 h-4" />
                     <span>Export Log</span>
@@ -364,26 +420,30 @@ const ActivityReport = ({ stats }) => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center space-x-4 p-4 bg-slate-50 rounded-lg border border-slate-200"
+                        className="neumorphic-inset p-4 bg-slate-50/50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600"
                     >
-                        <div className={`p-2 rounded-full ${
-                            activity.type === 'issue' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'
-                        }`}>
-                            <TrendingUp className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1">
-                            <p className="font-medium text-slate-900">
-                                {activity.type === 'issue' ? 'Issued' : 'Received'} {activity.quantity}x {activity.item}
-                            </p>
-                            <p className="text-sm text-slate-600">
-                                {activity.department} • {activity.time}
-                            </p>
-                        </div>
-                        <div className="text-right">
-                            <span className="text-sm text-slate-500">
-                                <Calendar className="w-4 h-4 inline mr-1" />
-                                Today
-                            </span>
+                        <div className="flex items-center space-x-4">
+                            <div className={`p-2 rounded-full ${
+                                activity.type === 'issue' 
+                                    ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' 
+                                    : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                            }`}>
+                                <TrendingUp className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="font-medium text-slate-900 dark:text-white">
+                                    {activity.type === 'issue' ? 'Issued' : 'Received'} {activity.quantity}x {activity.item}
+                                </p>
+                                <p className="text-sm text-slate-600 dark:text-slate-400">
+                                    {activity.department} • {activity.time}
+                                </p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-sm text-slate-500 dark:text-slate-400">
+                                    <Calendar className="w-4 h-4 inline mr-1" />
+                                    Today
+                                </span>
+                            </div>
                         </div>
                     </motion.div>
                 ))}
