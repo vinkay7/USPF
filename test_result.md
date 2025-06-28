@@ -220,17 +220,44 @@ backend:
         comment: "Verified GET /api/dashboard/stats endpoint returns dashboard statistics with 200 status code. The response includes total_items, total_value, low_stock_count, pending_requisitions, and recent_activities. The endpoint requires authentication and works properly with the 'uspf-token'."
 
 frontend:
+  - task: "Splash Screen with USPF Logo"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/SplashScreen.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented splash screen with USPF logo animations, floating circles, letter stagger animation, and 3-second display with fade out"
+
+  - task: "Neumorphic Design System"
+    implemented: true
+    working: "NA"
+    file: "frontend/tailwind.config.js, frontend/src/index.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Complete neumorphic design system with light/dark mode support, custom shadows, animations, and glass morphism effects"
+
   - task: "Login Page with Logo"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "frontend/src/components/Login.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Modern login page with USPF logo and admin/admin credentials"
+      - working: "NA"
+        agent: "main"
+        comment: "Completely redesigned with neumorphic styling, floating labels, split-screen hero section, dark mode toggle, and professional animations"
 
   - task: "Dashboard Layout (Hybrid Design)"
     implemented: false
