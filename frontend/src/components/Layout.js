@@ -28,17 +28,37 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
     // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (!event.target.closest('.notification-dropdown')) {
+            // Check if click is outside notification dropdown
+            const notificationDropdown = document.querySelector('.notification-dropdown');
+            if (notificationDropdown && !notificationDropdown.contains(event.target)) {
                 setNotificationOpen(false);
             }
-            if (!event.target.closest('.profile-dropdown')) {
+            
+            // Check if click is outside profile dropdown
+            const profileDropdown = document.querySelector('.profile-dropdown');
+            if (profileDropdown && !profileDropdown.contains(event.target)) {
                 setProfileOpen(false);
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+        // Close dropdowns on escape key
+        const handleEscapeKey = (event) => {
+            if (event.key === 'Escape') {
+                setNotificationOpen(false);
+                setProfileOpen(false);
+            }
+        };
+
+        if (notificationOpen || profileOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('keydown', handleEscapeKey);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [notificationOpen, profileOpen]);
 
     // Dark mode persistence
     useEffect(() => {
