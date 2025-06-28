@@ -280,7 +280,7 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                             </motion.button>
 
                             {/* Notifications Dropdown */}
-                            <div className="relative">
+                            <div className="relative notification-dropdown">
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
