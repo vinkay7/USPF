@@ -1,17 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Neumorphic Design System */
+@layer components {
+  .neumorphic {
+    @apply shadow-neumorphic-light dark:shadow-neumorphic-dark;
+  }
+  
+  .neumorphic-inset {
+    @apply shadow-neumorphic-inset-light dark:shadow-neumorphic-inset-dark;
+  }
+  
+  .neumorphic-button {
+    @apply neumorphic hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98];
+  }
+  
+  .neumorphic-input {
+    @apply neumorphic-inset focus:shadow-neumorphic-light dark:focus:shadow-neumorphic-dark transition-all duration-300;
+  }
+  
+  .glass-morphism {
+    @apply bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm;
+  }
+  
+  .floating-card {
+    @apply neumorphic glass-morphism rounded-xl border border-white/20 dark:border-slate-700/50;
+  }
+}
+
+/* Floating Animation for Background Elements */
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+.float-animation-delay {
+  animation: float 6s ease-in-out infinite 2s;
+}
+
+.float-animation-slow {
+  animation: float 8s ease-in-out infinite;
+}
+
+/* Bounce Animation for Loading Dots */
+.bounce-dot-1 {
+  animation: bounce 1.4s ease-in-out infinite;
+}
+
+.bounce-dot-2 {
+  animation: bounce 1.4s ease-in-out infinite 0.2s;
+}
+
+.bounce-dot-3 {
+  animation: bounce 1.4s ease-in-out infinite 0.4s;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #2563eb, #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Smooth transitions for dark mode */
+* {
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 dark:bg-slate-800 rounded-lg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-600 rounded-lg hover:bg-slate-400 dark:hover:bg-slate-500;
+}
+
+/* Letter stagger animation */
+.letter-stagger {
+  display: inline-block;
+  animation: staggerLetters 0.8s ease-out forwards;
+}
+
+.letter-stagger:nth-child(1) { animation-delay: 0.1s; }
+.letter-stagger:nth-child(2) { animation-delay: 0.2s; }
+.letter-stagger:nth-child(3) { animation-delay: 0.3s; }
+.letter-stagger:nth-child(4) { animation-delay: 0.4s; }
+
+/* Body and HTML base styles */
 body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-        "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-        "Helvetica Neue", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-        monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Prevent FOUC (Flash of Unstyled Content) */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
 }
