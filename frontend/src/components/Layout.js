@@ -411,11 +411,19 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={() => setNotificationOpen(!notificationOpen)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setNotificationOpen(!notificationOpen);
+                                        setProfileOpen(false); // Close profile when opening notifications
+                                    }}
                                     className="neumorphic p-3 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 bg-white/50 dark:bg-slate-800/30 transition-all relative"
+                                    aria-label="Notifications"
+                                    aria-expanded={notificationOpen}
                                 >
                                     <Bell className="w-5 h-5" />
-                                    <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>
+                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center">
+                                        <span className="text-xs text-white font-bold">{notifications.length}</span>
+                                    </span>
                                 </motion.button>
 
                                 <AnimatePresence>
@@ -424,21 +432,63 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            className="absolute right-0 mt-2 w-80 floating-card p-4 z-50"
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute right-0 mt-3 w-80 floating-card p-4 z-[9999]"
+                                            style={{ maxHeight: '400px' }}
+                                            onClick={(e) => e.stopPropagation()}
                                         >
-                                            <h3 className="font-semibold text-slate-900 dark:text-white mb-3">Notifications</h3>
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h3 className="font-semibold text-slate-900 dark:text-white">Notifications</h3>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                    onClick={() => setNotificationOpen(false)}
+                                                    className="w-6 h-6 neumorphic rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                                    aria-label="Close notifications"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </motion.button>
+                                            </div>
                                             <div className="space-y-3 max-h-64 overflow-y-auto">
-                                                {notifications.map((notification) => (
-                                                    <div key={notification.id} className="neumorphic-inset p-3 rounded-lg bg-slate-50/50 dark:bg-slate-700/50">
+                                                {notifications.length > 0 ? notifications.map((notification) => (
+                                                    <motion.div 
+                                                        key={notification.id} 
+                                                        whileHover={{ scale: 1.02 }}
+                                                        className="neumorphic-inset p-3 rounded-lg bg-slate-50/50 dark:bg-slate-700/50 cursor-pointer transition-all"
+                                                        onClick={() => {
+                                                            // Handle notification click
+                                                            console.log('Notification clicked:', notification);
+                                                        }}
+                                                    >
                                                         <p className="text-sm text-slate-800 dark:text-slate-200 mb-1">
                                                             {notification.message}
                                                         </p>
                                                         <p className="text-xs text-slate-500 dark:text-slate-400">
                                                             {notification.time}
                                                         </p>
+                                                    </motion.div>
+                                                )) : (
+                                                    <div className="text-center py-8">
+                                                        <Bell className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                                                        <p className="text-slate-500 dark:text-slate-400">No notifications</p>
                                                     </div>
-                                                ))}
+                                                )}
                                             </div>
+                                            {notifications.length > 0 && (
+                                                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-600">
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.02 }}
+                                                        whileTap={{ scale: 0.98 }}
+                                                        className="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                                                        onClick={() => {
+                                                            // Handle mark all as read
+                                                            setNotificationOpen(false);
+                                                        }}
+                                                    >
+                                                        Mark all as read
+                                                    </motion.button>
+                                                </div>
+                                            )}
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
