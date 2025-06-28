@@ -309,13 +309,19 @@ if __name__ == "__main__":
     print(f"API URL: {API_URL}")
     print("==============================================\n")
     
-    # Create a test suite with the specific tests requested in the review
+    # Run all tests to comprehensively check all API endpoints
     suite = unittest.TestSuite()
-    suite.addTest(USPFInventoryAPITest('test_11_health_check'))  # Health check endpoint
     suite.addTest(USPFInventoryAPITest('test_01_login'))         # Login endpoint
     suite.addTest(USPFInventoryAPITest('test_02_get_current_user'))  # Get current user
     suite.addTest(USPFInventoryAPITest('test_03_get_inventory'))  # Get inventory
+    suite.addTest(USPFInventoryAPITest('test_04_create_inventory_item'))  # Create inventory item
+    suite.addTest(USPFInventoryAPITest('test_05_update_inventory_item'))  # Update inventory item
+    suite.addTest(USPFInventoryAPITest('test_06_get_bin_card_history'))  # Get BIN card history
+    suite.addTest(USPFInventoryAPITest('test_07_get_requisitions'))  # Get requisitions
+    suite.addTest(USPFInventoryAPITest('test_08_create_requisition'))  # Create requisition
     suite.addTest(USPFInventoryAPITest('test_09_dashboard_stats'))  # Get dashboard stats
+    suite.addTest(USPFInventoryAPITest('test_10_low_stock_report'))  # Get low stock report
+    suite.addTest(USPFInventoryAPITest('test_11_health_check'))  # Health check endpoint
     
     # Run the tests
     runner = unittest.TextTestRunner(verbosity=2)
