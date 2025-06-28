@@ -499,13 +499,24 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={() => setProfileOpen(!profileOpen)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setProfileOpen(!profileOpen);
+                                        setNotificationOpen(false); // Close notifications when opening profile
+                                    }}
                                     className="neumorphic p-2 rounded-xl bg-white/50 dark:bg-slate-800/30 flex items-center space-x-2 transition-all"
+                                    aria-label="Profile menu"
+                                    aria-expanded={profileOpen}
                                 >
                                     <div className="w-8 h-8 neumorphic bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
                                         <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                                     </div>
-                                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                                    <motion.div
+                                        animate={{ rotate: profileOpen ? 180 : 0 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <ChevronDown className="w-4 h-4 text-slate-400" />
+                                    </motion.div>
                                 </motion.button>
 
                                 <AnimatePresence>
@@ -514,8 +525,23 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            className="absolute right-0 mt-2 w-64 floating-card p-4 z-50"
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute right-0 mt-3 w-64 floating-card p-4 z-[9999]"
+                                            onClick={(e) => e.stopPropagation()}
                                         >
+                                            <div className="flex items-center justify-between mb-4">
+                                                <h3 className="text-sm font-medium text-slate-900 dark:text-white">Account</h3>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                    onClick={() => setProfileOpen(false)}
+                                                    className="w-6 h-6 neumorphic rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                                    aria-label="Close profile menu"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </motion.button>
+                                            </div>
+                                            
                                             <div className="text-center mb-4">
                                                 <div className="w-16 h-16 neumorphic bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-2">
                                                     <User className="w-8 h-8 text-slate-600 dark:text-slate-300" />
@@ -527,21 +553,32 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                                                     {user?.role} • {user?.department}
                                                 </p>
                                             </div>
+                                            
                                             <div className="space-y-2">
-                                                <button 
-                                                    onClick={() => handleNavigation('settings')}
-                                                    className="w-full neumorphic text-left px-4 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all"
+                                                <motion.button 
+                                                    whileHover={{ scale: 1.02 }}
+                                                    whileTap={{ scale: 0.98 }}
+                                                    onClick={() => {
+                                                        handleNavigation('settings');
+                                                        setProfileOpen(false);
+                                                    }}
+                                                    className="w-full neumorphic text-left px-4 py-3 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all flex items-center space-x-3"
                                                 >
-                                                    <Settings className="w-4 h-4 inline mr-2" />
-                                                    Settings
-                                                </button>
-                                                <button 
-                                                    onClick={logout}
-                                                    className="w-full neumorphic text-left px-4 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                                                    <Settings className="w-4 h-4" />
+                                                    <span>Settings</span>
+                                                </motion.button>
+                                                <motion.button 
+                                                    whileHover={{ scale: 1.02 }}
+                                                    whileTap={{ scale: 0.98 }}
+                                                    onClick={() => {
+                                                        logout();
+                                                        setProfileOpen(false);
+                                                    }}
+                                                    className="w-full neumorphic text-left px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex items-center space-x-3"
                                                 >
-                                                    <LogOut className="w-4 h-4 inline mr-2" />
-                                                    Sign Out
-                                                </button>
+                                                    <LogOut className="w-4 h-4" />
+                                                    <span>Sign Out</span>
+                                                </motion.button>
                                             </div>
                                         </motion.div>
                                     )}
