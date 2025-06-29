@@ -143,15 +143,7 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                 <div className="flex items-center space-x-3">
                     <div className={`relative neumorphic p-2 rounded-xl ${
                         darkMode ? 'bg-slate-700' : 'bg-white'
-                    }`}
-                    style={{
-                        boxShadow: `
-                            0 8px 16px rgba(59, 130, 246, 0.1),
-                            0 4px 8px rgba(34, 197, 94, 0.05),
-                            inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                            inset 0 -1px 0 rgba(59, 130, 246, 0.05)
-                        `
-                    }}>
+                    }`}>
                         <img 
                             src="/uspf-logo.svg" 
                             alt="USPF Logo" 
