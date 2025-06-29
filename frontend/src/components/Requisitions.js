@@ -264,7 +264,7 @@ const Requisitions = () => {
                                             </div>
                                         </div>
                                         
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 overflow-x-auto scrollbar-hide min-w-0">
                                             <motion.button
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.95 }}
@@ -272,7 +272,7 @@ const Requisitions = () => {
                                                     setSelectedRequisition(requisition);
                                                     setShowViewModal(true);
                                                 }}
-                                                className="neumorphic p-2 rounded-lg text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                                                className="neumorphic p-2 rounded-lg text-blue-600 hover:text-blue-800 dark:text-blue-400 flex-shrink-0"
                                                 title="View Details"
                                             >
                                                 <Eye className="w-4 h-4" />
@@ -284,7 +284,7 @@ const Requisitions = () => {
                                                         whileHover={{ scale: 1.05 }}
                                                         whileTap={{ scale: 0.95 }}
                                                         onClick={() => handleUpdateStatus(requisition.id, 'approved', user.username)}
-                                                        className="neumorphic p-2 rounded-lg text-green-600 hover:text-green-800 dark:text-green-400"
+                                                        className="neumorphic p-2 rounded-lg text-green-600 hover:text-green-800 dark:text-green-400 flex-shrink-0"
                                                         title="Approve"
                                                     >
                                                         <Check className="w-4 h-4" />
@@ -293,7 +293,7 @@ const Requisitions = () => {
                                                         whileHover={{ scale: 1.05 }}
                                                         whileTap={{ scale: 0.95 }}
                                                         onClick={() => handleUpdateStatus(requisition.id, 'rejected', user.username)}
-                                                        className="neumorphic p-2 rounded-lg text-red-600 hover:text-red-800 dark:text-red-400"
+                                                        className="neumorphic p-2 rounded-lg text-red-600 hover:text-red-800 dark:text-red-400 flex-shrink-0"
                                                         title="Reject"
                                                     >
                                                         <X className="w-4 h-4" />
@@ -306,7 +306,7 @@ const Requisitions = () => {
                                                     whileHover={{ scale: 1.05 }}
                                                     whileTap={{ scale: 0.95 }}
                                                     onClick={() => handleUpdateStatus(requisition.id, 'fulfilled', null, user.username)}
-                                                    className="neumorphic p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                                                    className="neumorphic p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 hover:text-blue-800 dark:text-blue-400 flex-shrink-0"
                                                     title="Mark as Fulfilled"
                                                 >
                                                     <Package className="w-4 h-4" />
