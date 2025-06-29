@@ -128,7 +128,10 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
         };
         
         if (routes[id]) {
-            navigate(routes[id]);
+            // Use navigation with splash screen
+            navigateWithSplash(routes[id], () => {
+                navigate(routes[id]);
+            });
         }
         setSidebarOpen(false);
     };
