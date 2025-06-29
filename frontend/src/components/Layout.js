@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Layout = ({ children, currentPage = 'dashboard' }) => {
     const { user, logout } = useAuth();
+    const { navigateWithSplash } = useNavigation();
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
