@@ -150,18 +150,30 @@ def main():
     else:
         user_verified = False
     
+    # Test login with incorrect credentials
+    incorrect_login_test = test_login_with_incorrect_credentials()
+    
+    # Test CORS configuration
+    cors_test = test_cors_configuration()
+    
     # Print summary
     print("\n=== Test Summary ===")
-    if token and user_verified:
+    if token and user_verified and incorrect_login_test and cors_test:
         print("✅ Authentication system is working correctly!")
         print("✅ Successfully logged in with uspf/uspf credentials")
         print("✅ Successfully verified user identity with token")
+        print("✅ Properly handled incorrect credentials")
+        print("✅ CORS is properly configured")
     else:
         print("❌ Authentication system has issues:")
         if not token:
             print("  - Login with uspf/uspf credentials failed")
         if not user_verified and token:
             print("  - User verification with token failed")
+        if not incorrect_login_test:
+            print("  - Handling of incorrect credentials failed")
+        if not cors_test:
+            print("  - CORS configuration has issues")
 
 if __name__ == "__main__":
     main()
