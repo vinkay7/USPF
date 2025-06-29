@@ -76,36 +76,38 @@ const AppContent = () => {
 function App() {
   return (
     <AuthProvider>
-      <div className="App">
-        <AppContent />
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            className: 'neumorphic',
-            style: {
-              background: 'rgba(255, 255, 255, 0.9)',
-              color: '#1f2937',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '12px',
-              boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.1), -8px -8px 16px rgba(255, 255, 255, 0.8)',
-            },
-            success: {
+      <NavigationProvider>
+        <div className="App">
+          <AppContent />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              className: 'neumorphic',
               style: {
-                background: 'rgba(16, 185, 129, 0.9)',
-                color: '#ffffff',
+                background: 'rgba(255, 255, 255, 0.9)',
+                color: '#1f2937',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '12px',
+                boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.1), -8px -8px 16px rgba(255, 255, 255, 0.8)',
               },
-            },
-            error: {
-              style: {
-                background: 'rgba(239, 68, 68, 0.9)',
-                color: '#ffffff',
+              success: {
+                style: {
+                  background: 'rgba(16, 185, 129, 0.9)',
+                  color: '#ffffff',
+                },
               },
-            },
-          }}
-        />
-      </div>
+              error: {
+                style: {
+                  background: 'rgba(239, 68, 68, 0.9)',
+                  color: '#ffffff',
+                },
+              },
+            }}
+          />
+        </div>
+      </NavigationProvider>
     </AuthProvider>
   );
 }
