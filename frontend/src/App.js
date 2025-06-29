@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Login from './components/Login';
-import AppRouter from './components/Router';
-import SplashScreen from './components/SplashScreen';
-import './App.css';
-
-import React, { useState, useEffect } from 'react';
-import { Toaster } from 'react-hot-toast';
-import { AuthProvider, useAuth } from './context/AuthContext';
 import { NavigationProvider, useNavigation } from './context/NavigationContext';
 import Login from './components/Login';
 import AppRouter from './components/Router';
