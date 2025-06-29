@@ -373,12 +373,40 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                     {/* Top Header */}
                     <header className="floating-card h-16 flex items-center justify-between px-6 m-4 mb-0">
                         <div className="flex items-center space-x-4">
-                            <button
-                                onClick={() => setSidebarOpen(true)}
-                                className="lg:hidden neumorphic p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 bg-white/50 dark:bg-slate-800/30"
-                            >
-                                <Menu className="w-5 h-5" />
-                            </button>
+                            {/* Mobile hamburger menu with USPF logo */}
+                            <div className="lg:hidden flex items-center space-x-3">
+                                <button
+                                    onClick={() => setSidebarOpen(true)}
+                                    className="neumorphic p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 bg-white/50 dark:bg-slate-800/30"
+                                >
+                                    <Menu className="w-5 h-5" />
+                                </button>
+                                {/* USPF Logo beside hamburger */}
+                                <div className={`relative neumorphic p-2 rounded-xl ${
+                                    darkMode ? 'bg-slate-700' : 'bg-white'
+                                }`}
+                                style={{
+                                    boxShadow: `
+                                        0 4px 8px rgba(59, 130, 246, 0.1),
+                                        0 2px 4px rgba(34, 197, 94, 0.05),
+                                        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                                        inset 0 -1px 0 rgba(59, 130, 246, 0.05)
+                                    `
+                                }}>
+                                    <img 
+                                        src="/uspf-logo.svg" 
+                                        alt="USPF Logo" 
+                                        className="w-8 h-8 object-contain"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            e.target.nextSibling.style.display = 'flex';
+                                        }}
+                                    />
+                                    <div className="hidden w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg items-center justify-center">
+                                        <span className="text-white font-bold text-xs">USPF</span>
+                                    </div>
+                                </div>
+                            </div>
                             
                             {/* Search bar - Hidden on mobile */}
                             <div className="hidden md:flex relative">
