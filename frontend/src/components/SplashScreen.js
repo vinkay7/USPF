@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 
 const SplashScreen = ({ onComplete }) => {
   const [showContent, setShowContent] = useState(false);
-  const [logoLoaded, setLogoLoaded] = useState(false);
 
   useEffect(() => {
     // Show content after initial mount
