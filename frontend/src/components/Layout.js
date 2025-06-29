@@ -17,6 +17,7 @@ import {
     ChevronDown
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '../context/NavigationContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Layout = ({ children, currentPage = 'dashboard' }) => {
