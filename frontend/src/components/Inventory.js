@@ -380,6 +380,15 @@ const Inventory = () => {
                     setShowQRScanner(false);
                 }}
             />
+
+            <QRCodeModal
+                isOpen={showQRModal}
+                onClose={() => {
+                    setShowQRModal(false);
+                    setSelectedItem(null);
+                }}
+                item={selectedItem}
+            />
         </Layout>
     );
 };
