@@ -315,6 +315,10 @@ const Inventory = () => {
                                                     <motion.button
                                                         whileHover={{ scale: 1.1 }}
                                                         whileTap={{ scale: 0.9 }}
+                                                        onClick={() => {
+                                                            setSelectedItem(item);
+                                                            setShowQRModal(true);
+                                                        }}
                                                         className="neumorphic p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400"
                                                         title="Show QR Code"
                                                     >
