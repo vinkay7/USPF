@@ -41,7 +41,7 @@ const Settings = () => {
                 {/* Settings Navigation */}
                 <div className="floating-card flex-1 overflow-hidden">
                     <div className="border-b border-slate-200 dark:border-slate-700">
-                        <nav className="flex space-x-8 px-6" aria-label="Settings">
+                        <nav className="flex space-x-2 md:space-x-8 px-4 md:px-6 overflow-x-auto scrollbar-hide" aria-label="Settings">
                             {tabs.map((tab) => {
                                 const IconComponent = tab.icon;
                                 return (
@@ -50,14 +50,15 @@ const Settings = () => {
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                        className={`flex items-center space-x-2 py-4 px-2 md:px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                                             activeTab === tab.id
                                                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                                                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                                         }`}
                                     >
                                         <IconComponent className="w-4 h-4" />
-                                        <span>{tab.name}</span>
+                                        <span className="hidden sm:inline">{tab.name}</span>
+                                        <span className="sm:hidden">{tab.name.split(' ')[0]}</span>
                                     </motion.button>
                                 );
                             })}
