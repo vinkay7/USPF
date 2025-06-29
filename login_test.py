@@ -18,12 +18,12 @@ API_URL = f"{BACKEND_URL}/api"
 print(f"Testing API at: {API_URL}")
 
 def test_login():
-    """Test login endpoint with admin credentials"""
-    print("\n1. Testing POST /api/auth/login with admin/admin credentials...")
+    """Test login endpoint with uspf credentials"""
+    print("\n1. Testing POST /api/auth/login with uspf/uspf credentials...")
     
     login_data = {
-        "username": "admin",
-        "password": "admin"
+        "username": "uspf",
+        "password": "uspf"
     }
     
     try:
