@@ -103,7 +103,7 @@ const SplashScreen = ({ onComplete }) => {
 
       {/* Main Content */}
       <div className="relative z-10 text-center">
-        {/* Enhanced Logo Container */}
+        {/* Enhanced Logo Container - Decorative Only */}
         <motion.div
           initial={{ scale: 0.3, rotate: -180, opacity: 0 }}
           animate={{ scale: 1, rotate: 0, opacity: 1 }}
@@ -115,23 +115,9 @@ const SplashScreen = ({ onComplete }) => {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 to-green-600/30 rounded-full blur-xl scale-150 -z-10"></div>
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-green-500/20 rounded-full blur-2xl scale-200 -z-20 animate-pulse"></div>
             
-            {/* Main logo container with enhanced neumorphic design */}
+            {/* Decorative container without logo */}
             <div className="relative w-32 h-32 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-blue-100/50">
-              <img 
-                src="/uspf-logo.svg" 
-                alt="USPF Logo" 
-                className="w-32 h-32 object-contain"
-                onLoad={() => setLogoLoaded(true)}
-                onError={(e) => {
-                  // Fallback to text if image fails to load
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
-                }}
-              />
-              {/* Enhanced fallback text logo */}
-              <div className="hidden w-28 h-28 bg-gradient-to-br from-blue-600 via-blue-700 to-green-600 rounded-full items-center justify-center shadow-inner">
-                <span className="text-white font-bold text-3xl tracking-wider">USPF</span>
-              </div>
+              {/* Empty decorative circle */}
             </div>
 
             {/* Additional decorative rings */}
