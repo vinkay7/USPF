@@ -93,28 +93,28 @@ const Dashboard = () => {
             name: 'Add New Item', 
             icon: Plus, 
             color: 'blue', 
-            action: () => window.location.href = '/inventory',
+            action: () => navigateWithSplash('/inventory', () => navigate('/inventory')),
             description: 'Add inventory item'
         },
         { 
             name: 'Scan QR Code', 
             icon: QrCode, 
             color: 'green', 
-            action: () => window.location.href = '/inventory',
+            action: () => navigateWithSplash('/inventory', () => navigate('/inventory')),
             description: 'Quick item lookup'
         },
         { 
             name: 'Create Requisition', 
             icon: ShoppingCart, 
             color: 'orange', 
-            action: () => window.location.href = '/requisitions',
+            action: () => navigateWithSplash('/requisitions', () => navigate('/requisitions')),
             description: 'Request inventory'
         },
         { 
             name: 'View Reports', 
             icon: TrendingUp, 
             color: 'purple', 
-            action: () => window.location.href = '/reports',
+            action: () => navigateWithSplash('/reports', () => navigate('/reports')),
             description: 'Analytics & insights'
         },
     ];
