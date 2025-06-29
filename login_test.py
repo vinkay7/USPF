@@ -99,12 +99,12 @@ def main():
     print("\n=== Test Summary ===")
     if token and user_verified:
         print("✅ Authentication system is working correctly!")
-        print("✅ Successfully logged in with admin/admin credentials")
+        print("✅ Successfully logged in with uspf/uspf credentials")
         print("✅ Successfully verified user identity with token")
     else:
         print("❌ Authentication system has issues:")
         if not token:
-            print("  - Login with admin/admin credentials failed")
+            print("  - Login with uspf/uspf credentials failed")
         if not user_verified and token:
             print("  - User verification with token failed")
 
