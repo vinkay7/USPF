@@ -166,17 +166,9 @@ const Login = () => {
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="text-center mb-8"
               >
-                <div className={`mx-auto w-20 h-20 rounded-full shadow-xl flex items-center justify-center mb-6 overflow-hidden neumorphic ${
+                <div className={`relative w-20 h-20 neumorphic p-3 rounded-full mb-6 flex items-center justify-center mx-auto transition-all duration-500 transform hover:scale-105 ${
                   darkMode ? 'bg-slate-800' : 'bg-white'
-                }`}
-                style={{
-                  boxShadow: `
-                    0 10px 25px rgba(59, 130, 246, 0.15),
-                    0 5px 15px rgba(34, 197, 94, 0.1),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                    inset 0 -1px 0 rgba(59, 130, 246, 0.1)
-                  `
-                }}>
+                }`}>
                   <img 
                     src="/uspf-logo.svg" 
                     alt="USPF Logo" 
