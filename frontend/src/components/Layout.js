@@ -126,7 +126,7 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
         };
         
         if (routes[id]) {
-            window.location.href = routes[id];
+            navigate(routes[id]);
         }
         setSidebarOpen(false);
     };
