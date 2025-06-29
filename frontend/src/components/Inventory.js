@@ -760,4 +760,132 @@ const BinCardModal = ({ isOpen, onClose, item, history }) => {
     );
 };
 
+// QR Code Modal Component
+const QRCodeModal = ({ isOpen, onClose, item }) => {
+    if (!item) return null;
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                    onClick={onClose}
+                >
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.9, opacity: 0 }}
+                        className="floating-card p-6 w-full max-w-md"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">QR Code</h2>
+                                <p className="text-slate-600 dark:text-slate-400">{item.name}</p>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="neumorphic p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* QR Code Display */}
+                        <div className="text-center mb-6">
+                            <div className="neumorphic-inset p-6 rounded-xl bg-white dark:bg-slate-800 inline-block mb-4">
+                                {item.qr_code ? (
+                                    <img 
+                                        src={item.qr_code} 
+                                        alt={`QR Code for ${item.name}`}
+                                        className="w-48 h-48 object-contain mx-auto"
+                                    />
+                                ) : (
+                                    <div className="w-48 h-48 flex items-center justify-center bg-slate-100 dark:bg-slate-700 rounded-lg">
+                                        <div className="text-center">
+                                            <QrCode className="w-12 h-12 text-slate-400 mx-auto mb-2" />
+                                            <p className="text-slate-500 dark:text-slate-400 text-sm">QR Code not available</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">
+                                Scan this QR code to quickly access item information
+                            </p>
+                        </div>
+
+                        {/* Item Info */}
+                        <div className="neumorphic-inset p-4 rounded-xl bg-slate-50/50 dark:bg-slate-700/50 mb-6">
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                    <span className="text-slate-600 dark:text-slate-400">Item ID:</span>
+                                    <p className="font-medium text-slate-900 dark:text-white">{item.id}</p>
+                                </div>
+                                <div>
+                                    <span className="text-slate-600 dark:text-slate-400">Category:</span>
+                                    <p className="font-medium text-slate-900 dark:text-white">{item.category}</p>
+                                </div>
+                                <div>
+                                    <span className="text-slate-600 dark:text-slate-400">Quantity:</span>
+                                    <p className="font-medium text-slate-900 dark:text-white">{item.quantity}</p>
+                                </div>
+                                <div>
+                                    <span className="text-slate-600 dark:text-slate-400">Unit Cost:</span>
+                                    <p className="font-medium text-slate-900 dark:text-white">₦{item.unit_cost?.toLocaleString()}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={() => {
+                                    // Download QR code functionality
+                                    if (item.qr_code) {
+                                        const link = document.createElement('a');
+                                        link.href = item.qr_code;
+                                        link.download = `qr-code-${item.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+                                        link.click();
+                                    }
+                                }}
+                                className="flex-1 neumorphic-button py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl"
+                                disabled={!item.qr_code}
+                            >
+                                Download QR
+                            </button>
+                            <button
+                                onClick={() => {
+                                    // Print QR code functionality
+                                    if (item.qr_code) {
+                                        const printWindow = window.open('', '_blank');
+                                        printWindow.document.write(`
+                                            <html>
+                                                <head><title>QR Code - ${item.name}</title></head>
+                                                <body style="text-align: center; padding: 20px;">
+                                                    <h2>${item.name}</h2>
+                                                    <img src="${item.qr_code}" style="max-width: 300px;" />
+                                                    <p>Item ID: ${item.id}</p>
+                                                </body>
+                                            </html>
+                                        `);
+                                        printWindow.document.close();
+                                        printWindow.print();
+                                    }
+                                }}
+                                className="flex-1 neumorphic-button py-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-xl"
+                                disabled={!item.qr_code}
+                            >
+                                Print QR
+                            </button>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+};
+
 export default Inventory;
