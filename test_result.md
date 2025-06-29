@@ -226,7 +226,7 @@ frontend:
     file: "frontend/src/components/SplashScreen.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
@@ -234,6 +234,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Splash screen displays correctly with USPF logo, animations, and transitions to login page after a few seconds. Logo is properly centered with appropriate styling and animations."
+      - working: "NA"
+        agent: "main"
+        comment: "LOGO REMOVAL COMPLETED: Removed official USPF logo from splash screen while maintaining all animations and decorative effects. The splash screen now shows an empty decorative circle with glow effects, floating circles, USPF letter animations, and loading indicators - all logo-free as requested."
 
   - task: "Neumorphic Design System"
     implemented: true
