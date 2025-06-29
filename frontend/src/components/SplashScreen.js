@@ -180,8 +180,6 @@ const SplashScreen = ({ onComplete }) => {
             />
           ))}
         </motion.div>
-
-
       </div>
     </motion.div>
   );
