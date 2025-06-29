@@ -376,15 +376,7 @@ const Layout = ({ children, currentPage = 'dashboard' }) => {
                                 {/* USPF Logo beside hamburger */}
                                 <div className={`relative neumorphic p-2 rounded-xl ${
                                     darkMode ? 'bg-slate-700' : 'bg-white'
-                                }`}
-                                style={{
-                                    boxShadow: `
-                                        0 4px 8px rgba(59, 130, 246, 0.1),
-                                        0 2px 4px rgba(34, 197, 94, 0.05),
-                                        inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                                        inset 0 -1px 0 rgba(59, 130, 246, 0.05)
-                                    `
-                                }}>
+                                }`}>
                                     <img 
                                         src="/uspf-logo.svg" 
                                         alt="USPF Logo" 
