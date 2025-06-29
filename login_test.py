@@ -73,7 +73,7 @@ def test_current_user(token):
                 print("✅ User verification successful! Authenticated as uspf admin.")
                 return True
             else:
-                print("❌ User verification failed: Not authenticated as admin")
+                print("❌ User verification failed: Not authenticated as uspf admin")
                 return False
         else:
             print(f"❌ User verification failed with status code {response.status_code}")
@@ -81,6 +81,61 @@ def test_current_user(token):
             return False
     except Exception as e:
         print(f"❌ Error during user verification: {str(e)}")
+        return False
+
+def test_login_with_incorrect_credentials():
+    """Test login endpoint with incorrect credentials"""
+    print("\n3. Testing POST /api/auth/login with incorrect credentials...")
+    
+    login_data = {
+        "username": "wrong",
+        "password": "wrong"
+    }
+    
+    try:
+        response = requests.post(f"{API_URL}/auth/login", json=login_data)
+        
+        print(f"Status Code: {response.status_code}")
+        print(f"Response: {response.text}")
+        
+        if response.status_code == 401:
+            print("✅ Correct status code 401 for invalid credentials")
+            return True
+        else:
+            print(f"❌ Expected status code 401, got {response.status_code}")
+            return False
+    except Exception as e:
+        print(f"❌ Error during login test: {str(e)}")
+        return False
+
+def test_cors_configuration():
+    """Test CORS configuration"""
+    print("\n4. Testing CORS configuration...")
+    try:
+        # Send an OPTIONS request to check CORS headers
+        response = requests.options(f"{API_URL}/auth/login")
+        print(f"Status Code: {response.status_code}")
+        
+        # Check CORS headers
+        headers = response.headers
+        print("CORS Headers:")
+        for header in ['Access-Control-Allow-Origin', 'Access-Control-Allow-Methods', 'Access-Control-Allow-Headers']:
+            if header in headers:
+                print(f"✅ {header}: {headers[header]}")
+            else:
+                print(f"❌ {header} not found in response headers")
+        
+        # Check if Access-Control-Allow-Origin is properly set
+        if 'Access-Control-Allow-Origin' in headers:
+            origin = headers['Access-Control-Allow-Origin']
+            if origin == '*' or BACKEND_URL in origin:
+                print(f"✅ Access-Control-Allow-Origin is properly configured: {origin}")
+            else:
+                print(f"❌ Access-Control-Allow-Origin might not be properly configured: {origin}")
+        
+        return True
+    except Exception as e:
+        print(f"❌ Error during CORS test: {str(e)}")
         return False
 
 def main():
