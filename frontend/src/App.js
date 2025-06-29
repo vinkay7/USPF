@@ -6,12 +6,25 @@ import AppRouter from './components/Router';
 import SplashScreen from './components/SplashScreen';
 import './App.css';
 
+import React, { useState, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { NavigationProvider, useNavigation } from './context/NavigationContext';
+import Login from './components/Login';
+import AppRouter from './components/Router';
+import SplashScreen from './components/SplashScreen';
+import NavigationSplashScreen from './components/NavigationSplashScreen';
+import './App.css';
+
 const AppContent = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  const { showNavigationSplash, pendingNavigation } = useNavigation();
   const [showSplash, setShowSplash] = useState(true);
+  const [showPostLoginSplash, setShowPostLoginSplash] = useState(false);
+  const [wasLoggedIn, setWasLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Hide splash screen after it completes
+    // Hide initial splash screen after it completes
     const timer = setTimeout(() => {
       setShowSplash(false);
     }, 4000);
@@ -19,9 +32,36 @@ const AppContent = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Show splash screen first
+  // Show splash screen after login
+  useEffect(() => {
+    if (isAuthenticated && !wasLoggedIn && !showSplash) {
+      setShowPostLoginSplash(true);
+      setWasLoggedIn(true);
+      
+      // Hide post-login splash after 2 seconds
+      const timer = setTimeout(() => {
+        setShowPostLoginSplash(false);
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    } else if (!isAuthenticated) {
+      setWasLoggedIn(false);
+    }
+  }, [isAuthenticated, wasLoggedIn, showSplash]);
+
+  // Show initial splash screen first
   if (showSplash) {
     return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
+  // Show post-login splash screen
+  if (showPostLoginSplash) {
+    return <NavigationSplashScreen onComplete={() => setShowPostLoginSplash(false)} currentPage="dashboard" />;
+  }
+
+  // Show navigation splash screen
+  if (showNavigationSplash) {
+    return <NavigationSplashScreen onComplete={() => {}} currentPage={pendingNavigation?.path?.replace('/', '') || 'dashboard'} />;
   }
 
   if (isLoading) {
