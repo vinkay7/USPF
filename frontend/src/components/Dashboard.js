@@ -15,9 +15,11 @@ import {
     ShoppingCart
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '../context/NavigationContext';
 import toast from 'react-hot-toast';
 
 const Dashboard = () => {
