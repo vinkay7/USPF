@@ -17,10 +17,8 @@ export const AuthProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem('uspf_token'));
 
-    // Use relative URLs in production (Vercel) or environment variable in development
-    const API_BASE = process.env.NODE_ENV === 'production' 
-        ? '/api' 
-        : (process.env.REACT_APP_BACKEND_URL + '/api');
+    // Use environment variable for API base URL
+    const API_BASE = process.env.REACT_APP_BACKEND_URL + '/api';
 
     useEffect(() => {
         if (token) {
