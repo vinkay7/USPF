@@ -24,6 +24,8 @@ import toast from 'react-hot-toast';
 
 const Dashboard = () => {
     const { token } = useAuth();
+    const { navigateWithSplash } = useNavigation();
+    const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
