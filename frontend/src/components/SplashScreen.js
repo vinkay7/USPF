@@ -117,23 +117,12 @@ const SplashScreen = ({ onComplete }) => {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-green-500/20 rounded-full blur-2xl scale-200 -z-20 animate-pulse"></div>
             
             {/* Main logo container with enhanced neumorphic design */}
-            <div className="relative w-32 h-32 bg-white/90 backdrop-blur-sm rounded-full shadow-2xl flex items-center justify-center border-2 border-blue-100/50"
-                 style={{
-                   boxShadow: `
-                     0 20px 40px rgba(59, 130, 246, 0.15),
-                     0 10px 20px rgba(34, 197, 94, 0.1),
-                     inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                     inset 0 -1px 0 rgba(59, 130, 246, 0.1)
-                   `
-                 }}>
+            <div className="relative w-32 h-32 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-blue-100/50">
               <img 
                 src="/uspf-logo.svg" 
                 alt="USPF Logo" 
-                className="w-32 h-32 object-contain drop-shadow-2xl"
+                className="w-32 h-32 object-contain"
                 onLoad={() => setLogoLoaded(true)}
-                style={{
-                  filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.15))'
-                }}
                 onError={(e) => {
                   // Fallback to text if image fails to load
                   e.target.style.display = 'none';
