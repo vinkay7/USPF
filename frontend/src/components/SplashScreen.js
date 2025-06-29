@@ -182,18 +182,7 @@ const SplashScreen = ({ onComplete }) => {
           ))}
         </motion.div>
 
-        {/* Logo Load Success Indicator */}
-        {logoLoaded && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.5, duration: 0.5 }}
-            className="absolute top-8 right-8 flex items-center space-x-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium"
-          >
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span>Official Logo Loaded</span>
-          </motion.div>
-        )}
+
       </div>
     </motion.div>
   );
