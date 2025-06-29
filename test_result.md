@@ -237,6 +237,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "LOGO REMOVAL COMPLETED: Removed official USPF logo from splash screen while maintaining all animations and decorative effects. The splash screen now shows an empty decorative circle with glow effects, floating circles, USPF letter animations, and loading indicators - all logo-free as requested."
+      - working: "NA"
+        agent: "main"
+        comment: "WATERMARK REMOVAL COMPLETED: Restored the official USPF logo to the splash screen but removed the 'Official Logo Loaded' watermark indicator that appeared in the top-right corner. The splash screen now displays the USPF logo with all animations and decorative effects, but without the green watermark popup that said 'Official Logo Loaded'."
 
   - task: "Neumorphic Design System"
     implemented: true
