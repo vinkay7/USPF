@@ -69,8 +69,8 @@ def test_current_user(token):
             print(f"Response: {json.dumps(user_data, indent=2)}")
             
             # Verify user data
-            if user_data.get("username") == "admin" and user_data.get("role") == "admin":
-                print("✅ User verification successful! Authenticated as admin.")
+            if user_data.get("username") == "uspf" and user_data.get("role") == "admin":
+                print("✅ User verification successful! Authenticated as uspf admin.")
                 return True
             else:
                 print("❌ User verification failed: Not authenticated as admin")
