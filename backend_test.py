@@ -129,17 +129,47 @@ class USPFInventoryAPITest(unittest.TestCase):
         self.__class__.access_token = new_token
         print("Successfully refreshed access token")
     
-    def test_02_get_current_user(self):
-        """Test protected endpoint to get current user info"""
-        response = requests.get(f"{API_URL}/auth/me", headers=self.get_auth_headers())
+    def test_04_invalid_token_handling(self):
+        """Test handling of invalid tokens"""
+        # Test with invalid token
+        invalid_token = "invalid.token.format"
+        headers = {"Authorization": f"Bearer {invalid_token}"}
         
-        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        response = requests.get(f"{API_URL}/auth/me", headers=headers)
+        self.assertEqual(response.status_code, 401, "Invalid token should return 401 Unauthorized")
         
-        user_data = response.json()
-        self.assertEqual(user_data.get("username"), "uspf", "Username should be 'uspf'")
-        self.assertEqual(user_data.get("role"), "admin", "Role should be 'admin'")
+        # Test with malformed but valid JWT format
+        malformed_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3BmIiwicm9sZSI6ImFkbWluIn0.invalid-signature"
+        headers = {"Authorization": f"Bearer {malformed_token}"}
+        
+        response = requests.get(f"{API_URL}/auth/me", headers=headers)
+        self.assertEqual(response.status_code, 401, "Malformed token should return 401 Unauthorized")
+        
+        # Test with no token
+        response = requests.get(f"{API_URL}/auth/me")
+        self.assertEqual(response.status_code, 401, "No token should return 401 Unauthorized")
+        
+        # Test with expired token (we can't easily test this without waiting, but we can check the error handling)
+        # In a real test, we might mock the token verification to simulate expiration
     
-    def test_03_get_inventory(self):
+    def test_05_protected_endpoints(self):
+        """Test protected endpoints with valid JWT token"""
+        # Test inventory endpoint
+        response = requests.get(f"{API_URL}/inventory", headers=self.get_auth_headers())
+        self.assertEqual(response.status_code, 200, "Inventory endpoint should be accessible with valid token")
+        
+        # Test dashboard stats endpoint
+        response = requests.get(f"{API_URL}/dashboard/stats", headers=self.get_auth_headers())
+        self.assertEqual(response.status_code, 200, "Dashboard stats endpoint should be accessible with valid token")
+        
+        # Verify response data
+        stats = response.json()
+        self.assertIn("total_items", stats, "Stats should include total_items")
+        self.assertIn("total_value", stats, "Stats should include total_value")
+        self.assertIn("low_stock_count", stats, "Stats should include low_stock_count")
+        self.assertIn("pending_requisitions", stats, "Stats should include pending_requisitions")
+    
+    def test_06_get_inventory(self):
         """Test getting inventory items"""
         response = requests.get(f"{API_URL}/inventory", headers=self.get_auth_headers())
         
@@ -156,7 +186,7 @@ class USPFInventoryAPITest(unittest.TestCase):
         self.assertIn("quantity", first_item, "Item should have a quantity")
         self.assertIn("qr_code", first_item, "Item should have a QR code")
     
-    def test_04_create_inventory_item(self):
+    def test_07_create_inventory_item(self):
         """Test creating a new inventory item"""
         new_item = {
             "name": "Test Item",
@@ -199,10 +229,10 @@ class USPFInventoryAPITest(unittest.TestCase):
         except Exception as e:
             self.fail(f"QR code is not a valid base64 image: {str(e)}")
     
-    def test_05_update_inventory_item(self):
+    def test_08_update_inventory_item(self):
         """Test updating an inventory item"""
         # Make sure we have an item ID from the create test
-        if not hasattr(self, 'item_id'):
+        if not self.__class__.item_id:
             self.fail("No item ID available for update test")
         
         update_data = {
@@ -212,7 +242,7 @@ class USPFInventoryAPITest(unittest.TestCase):
         }
         
         response = requests.put(
-            f"{API_URL}/inventory/{self.item_id}", 
+            f"{API_URL}/inventory/{self.__class__.item_id}", 
             json=update_data, 
             headers=self.get_auth_headers()
         )
@@ -220,16 +250,16 @@ class USPFInventoryAPITest(unittest.TestCase):
         self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
         
         updated_item = response.json()
-        self.assertEqual(updated_item.get("id"), self.item_id, "Updated item ID should match")
+        self.assertEqual(updated_item.get("id"), self.__class__.item_id, "Updated item ID should match")
         
         # Note: The current implementation doesn't actually update the item in a database,
         # it just returns a sample updated item. In a real implementation, we would verify
         # that the updated fields match what we sent.
     
-    def test_06_get_bin_card_history(self):
+    def test_09_get_bin_card_history(self):
         """Test getting BIN card history for an item"""
         # Use the item ID from the create test, or a sample ID if not available
-        item_id = getattr(self, 'item_id', "inv-001")
+        item_id = self.__class__.item_id or "inv-001"
         
         response = requests.get(
             f"{API_URL}/inventory/{item_id}/bin-card", 
@@ -250,7 +280,7 @@ class USPFInventoryAPITest(unittest.TestCase):
         self.assertIn("quantity", first_entry, "Entry should have a quantity")
         self.assertIn("balance", first_entry, "Entry should have a balance")
     
-    def test_07_get_requisitions(self):
+    def test_10_get_requisitions(self):
         """Test getting requisition requests"""
         response = requests.get(f"{API_URL}/requisitions", headers=self.get_auth_headers())
         
