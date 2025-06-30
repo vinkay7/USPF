@@ -11,7 +11,12 @@ const QRCodeDisplay = ({ isOpen, onClose, data, title = "QR Code" }) => {
     // Generate QR code when modal opens
     React.useEffect(() => {
         if (isOpen && data) {
+            console.log('Modal opened with data:', data);
             generateQRCode();
+        } else if (!isOpen) {
+            // Reset state when modal closes
+            setQrCodeImage(null);
+            setIsGenerating(false);
         }
     }, [isOpen, data]);
 
