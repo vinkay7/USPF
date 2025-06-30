@@ -12,11 +12,13 @@ import {
     MoreVertical,
     Eye,
     Download,
-    Upload
+    Upload,
+    X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from './Layout';
 import QRScanner from './QRScanner';
+import QRCodeDisplay from './QRCodeDisplay';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
