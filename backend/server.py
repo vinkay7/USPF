@@ -1112,13 +1112,13 @@ async def receive_frontend_logs(logs_data: Dict[str, Any]):
             
             # Log based on level
             if level == "ERROR":
-                logger.error(f"Frontend: {message}", frontend_error=frontend_log_data)
+                logger.error(f"Frontend: {message}", extra={"frontend_error": frontend_log_data})
             elif level == "WARN":
-                logger.warning(f"Frontend: {message}", frontend_warning=frontend_log_data)
+                logger.warning(f"Frontend: {message}", extra={"frontend_warning": frontend_log_data})
             elif level == "INFO":
-                logger.info(f"Frontend: {message}", frontend_info=frontend_log_data)
+                logger.info(f"Frontend: {message}", extra={"frontend_info": frontend_log_data})
             else:
-                logger.debug(f"Frontend: {message}", frontend_debug=frontend_log_data)
+                logger.debug(f"Frontend: {message}", extra={"frontend_debug": frontend_log_data})
         
         return {"success": True, "processed": len(logs)}
         
