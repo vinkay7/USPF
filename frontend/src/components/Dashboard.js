@@ -102,7 +102,7 @@ const Dashboard = () => {
             name: 'Scan QR Code', 
             icon: QrCode, 
             color: 'green', 
-            action: () => navigateWithSplash('/inventory', () => navigate('/inventory')),
+            action: () => setShowQRScanner(true),
             description: 'Quick item lookup'
         },
         { 
