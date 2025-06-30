@@ -3,6 +3,8 @@
  * Provides structured logging, performance monitoring, and error tracking
  */
 
+import React from 'react';
+
 class FrontendLogger {
   constructor() {
     this.isProduction = process.env.NODE_ENV === 'production';
