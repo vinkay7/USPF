@@ -652,6 +652,15 @@ if __name__ == "__main__":
     suite.addTest(USPFInventoryAPITest('test_12_dashboard_stats'))  # Get dashboard stats
     suite.addTest(USPFInventoryAPITest('test_13_low_stock_report'))  # Get low stock report
     suite.addTest(USPFInventoryAPITest('test_14_health_check'))  # Health check endpoint
+    suite.addTest(USPFInventoryAPITest('test_15_detailed_health_check'))  # Detailed health check
+    suite.addTest(USPFInventoryAPITest('test_16_health_trends'))  # Health trends
+    suite.addTest(USPFInventoryAPITest('test_17_metrics_endpoint'))  # Metrics endpoint
+    suite.addTest(USPFInventoryAPITest('test_18_frontend_logs_endpoint'))  # Frontend logs endpoint
+    suite.addTest(USPFInventoryAPITest('test_19_frontend_errors_endpoint'))  # Frontend errors endpoint
+    suite.addTest(USPFInventoryAPITest('test_20_health_cron_endpoint'))  # Health cron endpoint
+    suite.addTest(USPFInventoryAPITest('test_21_security_headers'))  # Security headers
+    suite.addTest(USPFInventoryAPITest('test_22_timeout_handling'))  # Timeout handling
+    suite.addTest(USPFInventoryAPITest('test_23_rate_limiting'))  # Rate limiting
     
     # Run the tests
     runner = unittest.TextTestRunner(verbosity=2)
