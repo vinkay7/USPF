@@ -968,13 +968,14 @@ async def shutdown_event():
     try:
         logger.info("Starting graceful shutdown")
         
-        # Wait for active requests to complete
-        await graceful_shutdown.shutdown(timeout=20)
+        # Wait for active requests to complete only if utils available
+        if UTILS_AVAILABLE:
+            await graceful_shutdown.shutdown(timeout=20)
         
         logger.info("Graceful shutdown completed")
         
     except Exception as e:
-        logger.error(f"Shutdown error: {str(e)}", exc_info=True)
+        logger.error(f"Shutdown error: {str(e)}")
 
 # Enhanced Health check endpoints
 @app.get("/health")
