@@ -355,7 +355,7 @@ frontend:
     file: "frontend/src/components/QRScanner.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
@@ -366,6 +366,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "QR Scanner component renders correctly with proper styling and animations. Camera permissions are handled appropriately. Manual input fallback is available and functional. The scanner modal opens and closes correctly."
+      - working: "NA"
+        agent: "main"
+        comment: "QR CODE DISPLAY FIX COMPLETED: Fixed the QR code display issue where clicking QR code buttons showed loading spinner indefinitely. The problem was in the QRCodeDisplay component using dynamic import for the qrcode library and not properly handling backend-generated QR codes. Fixed by: 1) Changed to static import of qrcode library, 2) Added proper error handling and debugging, 3) Modified component to use existing QR codes from backend instead of regenerating them, 4) Updated both Inventory and Settings components to pass backend QR codes, 5) Added reset functionality when modal closes. QR code display should now work properly when clicking QR code buttons in inventory table."
 
   - task: "Requisition Management UI"
     implemented: true
