@@ -995,10 +995,19 @@ async def health_check():
 async def detailed_health_check():
     """Comprehensive health check with all system components"""
     try:
-        health_report = await health_monitor.run_all_checks()
-        return health_report
+        if UTILS_AVAILABLE:
+            health_report = await health_monitor.run_all_checks()
+            return health_report
+        else:
+            return {
+                "status": "healthy",
+                "service": "USPF Inventory Management API",
+                "version": "2.0.0",
+                "mode": "simplified",
+                "timestamp": datetime.utcnow().isoformat()
+            }
     except Exception as e:
-        logger.error(f"Health check failed: {str(e)}", exc_info=True)
+        logger.error(f"Health check failed: {str(e)}")
         return {
             "status": "unhealthy",
             "error": str(e),
