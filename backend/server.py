@@ -218,28 +218,43 @@ def generate_qr_code(data: dict) -> str:
         return ""
 
 async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)) -> User:
-    """Get current user from token"""
+    """Get current user from JWT token"""
     if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required"
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # For demo purposes, we'll use a simple token validation
-    # In production, you'd validate JWT tokens properly
-    if credentials.credentials == "uspf-token":
+    try:
+        # Verify the JWT token
+        payload = verify_token(credentials.credentials, "access")
+        username = payload.get("sub")
+        if username is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Return user data from token payload
         return User(
-            id="uspf-001",
-            username="uspf",
-            role="admin",
-            department="secretariat",
-            full_name="USPF Administrator"
+            id=payload.get("user_id", "uspf-001"),
+            username=username,
+            role=payload.get("role", "admin"),
+            department=payload.get("department", "secretariat"),
+            full_name=payload.get("full_name", "USPF Administrator")
         )
-    
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid authentication credentials"
-    )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Token validation error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 # API Routes
 
