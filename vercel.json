@@ -24,6 +24,10 @@
       "destination": "/api/auth/me.py"
     },
     {
+      "source": "/api/auth/refresh",
+      "destination": "/api/auth/refresh.py"
+    },
+    {
       "source": "/api/health",
       "destination": "/api/health.py"
     },
