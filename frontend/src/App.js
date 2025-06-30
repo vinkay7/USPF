@@ -105,41 +105,69 @@ const AppContent = () => {
 };
 
 function App() {
+  // Log application startup
+  useEffect(() => {
+    logger.info('USPF Inventory Management System started', {
+      version: '2.0.0',
+      environment: process.env.NODE_ENV,
+      backend_url: process.env.REACT_APP_BACKEND_URL,
+      user_agent: navigator.userAgent,
+      timestamp: new Date().toISOString()
+    });
+
+    // Log performance metrics
+    if (typeof performance !== 'undefined' && performance.timing) {
+      const timing = performance.timing;
+      const loadTime = timing.loadEventEnd - timing.navigationStart;
+      const domContentLoaded = timing.domContentLoadedEventEnd - timing.navigationStart;
+      
+      logger.info('Application performance metrics', {
+        load_time_ms: loadTime,
+        dom_content_loaded_ms: domContentLoaded,
+        navigation_type: performance.navigation ? performance.navigation.type : 'unknown'
+      });
+    }
+  }, []);
+
   return (
-    <AuthProvider>
-      <NavigationProvider>
-        <div className="App">
-          <AppContent />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              className: 'neumorphic',
-              style: {
-                background: 'rgba(255, 255, 255, 0.9)',
-                color: '#1f2937',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '12px',
-                boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.1), -8px -8px 16px rgba(255, 255, 255, 0.8)',
-              },
-              success: {
-                style: {
-                  background: 'rgba(16, 185, 129, 0.9)',
-                  color: '#ffffff',
-                },
-              },
-              error: {
-                style: {
-                  background: 'rgba(239, 68, 68, 0.9)',
-                  color: '#ffffff',
-                },
-              },
-            }}
-          />
-        </div>
-      </NavigationProvider>
-    </AuthProvider>
+    <ErrorBoundary name="App">
+      <AuthProvider>
+        <NavigationProvider>
+          <ErrorBoundary name="AppContent">
+            <div className="App">
+              <AppContent />
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  className: 'neumorphic',
+                  style: {
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    color: '#1f2937',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '12px',
+                    boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.1), -8px -8px 16px rgba(255, 255, 255, 0.8)',
+                  },
+                  success: {
+                    style: {
+                      background: 'rgba(16, 185, 129, 0.9)',
+                      color: '#ffffff',
+                    },
+                  },
+                  error: {
+                    style: {
+                      background: 'rgba(239, 68, 68, 0.9)',
+                      color: '#ffffff',
+                    },
+                  },
+                }}
+              />
+            </div>
+          </ErrorBoundary>
+        </NavigationProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
