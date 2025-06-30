@@ -427,19 +427,29 @@ async def login(request: LoginRequest):
         )
 
 @api_router.get("/auth/me", response_model=User)
+@monitor_performance("get_user_info")
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
-    """Get current user information"""
+    """Get current user information with logging"""
+    logger.debug("User info requested", user_request={
+        "user_id": current_user.id,
+        "username": current_user.username,
+        "role": current_user.role
+    })
     return current_user
 
 @api_router.post("/auth/refresh", response_model=TokenRefreshResponse)
+@monitor_performance("token_refresh")
 async def refresh_token(request: TokenRefreshRequest):
-    """Refresh access token using refresh token"""
+    """Refresh access token using refresh token with enhanced error handling"""
     try:
+        logger.info("Token refresh attempt")
+        
         # Verify refresh token
         payload = verify_token(request.refresh_token, "refresh")
         username = payload.get("sub")
         
         if username is None:
+            logger.warning("Token refresh failed - missing username")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid refresh token",
@@ -461,7 +471,10 @@ async def refresh_token(request: TokenRefreshRequest):
             expires_delta=access_token_expires
         )
         
-        logger.info(f"Token refreshed for user: {username}")
+        logger.info("Token refreshed successfully", token_refresh={
+            "username": username,
+            "user_id": user_data["user_id"]
+        })
         
         return TokenRefreshResponse(
             access_token=new_access_token,
@@ -472,7 +485,9 @@ async def refresh_token(request: TokenRefreshRequest):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Token refresh error: {str(e)}")
+        logger.error("Token refresh system error", refresh_error={
+            "error": str(e)
+        }, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid refresh token",
