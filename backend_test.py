@@ -8,6 +8,7 @@ import unittest
 import sys
 import os
 import time
+import jwt
 from dotenv import load_dotenv
 
 # Load environment variables from frontend/.env to get the backend URL
@@ -29,7 +30,8 @@ class USPFInventoryAPITest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up test class - login and get token"""
-        cls.token = "uspf-token"  # Using the specified token directly
+        cls.access_token = None
+        cls.refresh_token = None
         cls.login_response = None
         cls.item_id = None  # Initialize item_id at class level
         
@@ -43,33 +45,89 @@ class USPFInventoryAPITest(unittest.TestCase):
             response = requests.post(f"{API_URL}/auth/login", json=login_data)
             if response.status_code == 200:
                 cls.login_response = response.json()
-                # Verify the token matches our expected token
-                if cls.login_response.get("token") != cls.token:
-                    print(f"Warning: Token from server '{cls.login_response.get('token')}' doesn't match expected token '{cls.token}'")
-                print("Successfully logged in and obtained token")
+                cls.access_token = cls.login_response.get("access_token")
+                cls.refresh_token = cls.login_response.get("refresh_token")
+                print("Successfully logged in and obtained tokens")
             else:
                 print(f"Login failed with status code {response.status_code}: {response.text}")
         except Exception as e:
             print(f"Error during login: {str(e)}")
     
     def get_auth_headers(self):
-        """Get authorization headers with token"""
-        if not self.token:
+        """Get authorization headers with access token"""
+        if not self.access_token:
             self.fail("No authentication token available")
-        return {"Authorization": f"Bearer {self.token}"}
+        return {"Authorization": f"Bearer {self.access_token}"}
     
     def test_01_login(self):
-        """Test login endpoint with admin credentials"""
+        """Test login endpoint with uspf credentials"""
         # Login was already performed in setUpClass, just verify the response
         self.assertIsNotNone(self.login_response, "Login response should not be None")
         self.assertTrue(self.login_response.get("success"), "Login should be successful")
-        self.assertIsNotNone(self.login_response.get("token"), "Token should be returned")
+        
+        # Verify tokens
+        self.assertIsNotNone(self.access_token, "Access token should be returned")
+        self.assertIsNotNone(self.refresh_token, "Refresh token should be returned")
+        self.assertIsNotNone(self.login_response.get("expires_in"), "Token expiration should be returned")
+        self.assertEqual(self.login_response.get("token_type"), "bearer", "Token type should be 'bearer'")
         
         # Verify user data
         user = self.login_response.get("user")
         self.assertIsNotNone(user, "User data should be returned")
         self.assertEqual(user.get("username"), "uspf", "Username should be 'uspf'")
         self.assertEqual(user.get("role"), "admin", "Role should be 'admin'")
+        
+        # Verify JWT token structure
+        try:
+            # Decode without verification to check payload structure
+            decoded_token = jwt.decode(self.access_token, options={"verify_signature": False})
+            self.assertIn("exp", decoded_token, "Token should have expiration time")
+            self.assertIn("sub", decoded_token, "Token should have subject claim")
+            self.assertEqual(decoded_token.get("sub"), "uspf", "Token subject should be 'uspf'")
+            self.assertEqual(decoded_token.get("role"), "admin", "Token should contain role claim")
+            self.assertEqual(decoded_token.get("type"), "access", "Token should be of type 'access'")
+            print("JWT token structure verified successfully")
+        except Exception as e:
+            self.fail(f"Failed to decode JWT token: {str(e)}")
+    
+    def test_02_token_validation(self):
+        """Test token validation with /api/auth/me endpoint"""
+        response = requests.get(f"{API_URL}/auth/me", headers=self.get_auth_headers())
+        
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        
+        user_data = response.json()
+        self.assertEqual(user_data.get("username"), "uspf", "Username should be 'uspf'")
+        self.assertEqual(user_data.get("role"), "admin", "Role should be 'admin'")
+    
+    def test_03_token_refresh(self):
+        """Test token refresh endpoint"""
+        if not self.refresh_token:
+            self.fail("No refresh token available for testing")
+            
+        refresh_data = {
+            "refresh_token": self.refresh_token
+        }
+        
+        response = requests.post(f"{API_URL}/auth/refresh", json=refresh_data)
+        
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        
+        refresh_response = response.json()
+        self.assertIn("access_token", refresh_response, "Response should contain new access token")
+        self.assertIn("expires_in", refresh_response, "Response should contain token expiration")
+        self.assertEqual(refresh_response.get("token_type"), "bearer", "Token type should be 'bearer'")
+        
+        # Verify the new token works
+        new_token = refresh_response.get("access_token")
+        headers = {"Authorization": f"Bearer {new_token}"}
+        
+        me_response = requests.get(f"{API_URL}/auth/me", headers=headers)
+        self.assertEqual(me_response.status_code, 200, "New token should be valid for authentication")
+        
+        # Update the class token for subsequent tests
+        self.__class__.access_token = new_token
+        print("Successfully refreshed access token")
     
     def test_02_get_current_user(self):
         """Test protected endpoint to get current user info"""
