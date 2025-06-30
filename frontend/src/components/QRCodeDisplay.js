@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { QrCode, Download, Printer, Copy, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import QRCode from 'qrcode';
 
 const QRCodeDisplay = ({ isOpen, onClose, data, title = "QR Code" }) => {
     const [qrCodeImage, setQrCodeImage] = useState(null);
