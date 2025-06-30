@@ -10,15 +10,23 @@ const QRCodeDisplay = ({ isOpen, onClose, data, title = "QR Code", qrCodeImage: 
 
     // Generate QR code when modal opens
     React.useEffect(() => {
-        if (isOpen && data) {
-            console.log('Modal opened with data:', data);
-            generateQRCode();
-        } else if (!isOpen) {
+        if (isOpen) {
+            if (existingQRCode) {
+                // Use existing QR code from backend
+                console.log('Using existing QR code from backend');
+                setQrCodeImage(existingQRCode);
+                setIsGenerating(false);
+            } else if (data) {
+                // Generate new QR code
+                console.log('Modal opened with data:', data);
+                generateQRCode();
+            }
+        } else {
             // Reset state when modal closes
             setQrCodeImage(null);
             setIsGenerating(false);
         }
-    }, [isOpen, data]);
+    }, [isOpen, data, existingQRCode]);
 
     const generateQRCode = async () => {
         setIsGenerating(true);
