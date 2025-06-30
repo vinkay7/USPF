@@ -316,6 +316,54 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current user information"""
     return current_user
 
+@api_router.post("/auth/refresh", response_model=TokenRefreshResponse)
+async def refresh_token(request: TokenRefreshRequest):
+    """Refresh access token using refresh token"""
+    try:
+        # Verify refresh token
+        payload = verify_token(request.refresh_token, "refresh")
+        username = payload.get("sub")
+        
+        if username is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Create new access token
+        user_data = {
+            "user_id": payload.get("user_id"),
+            "username": username,
+            "role": payload.get("role"),
+            "department": payload.get("department"),
+            "full_name": payload.get("full_name")
+        }
+        
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        new_access_token = create_access_token(
+            data={"sub": username, **user_data},
+            expires_delta=access_token_expires
+        )
+        
+        logger.info(f"Token refreshed for user: {username}")
+        
+        return TokenRefreshResponse(
+            access_token=new_access_token,
+            token_type="bearer",
+            expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Token refresh error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
 @api_router.get("/inventory", response_model=List[InventoryItem])
 async def get_inventory(current_user: User = Depends(get_current_user)):
     """Get all inventory items"""
