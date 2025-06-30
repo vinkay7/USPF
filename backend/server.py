@@ -1053,9 +1053,6 @@ async def system_metrics():
         logger.error(f"Metrics collection error: {str(e)}", exc_info=True)
         return {"error": str(e)}
 
-# Track startup time for uptime calculation
-startup_time = datetime.utcnow()
-
 # Additional endpoints for frontend logging and monitoring
 @api_router.post("/logs/frontend")
 @monitor_performance("frontend_log_ingestion")
