@@ -1036,41 +1036,52 @@ async def health_trends(hours: int = 24):
 async def system_metrics():
     """Get system performance metrics"""
     try:
-        import psutil
-        
-        # System metrics
-        memory = psutil.virtual_memory()
-        cpu_percent = psutil.cpu_percent(interval=1)
-        
-        # Database metrics
-        db_stats = db_manager.get_connection_stats()
-        
-        # Error metrics
-        from utils import error_tracker
-        error_summary = error_tracker.get_error_summary()
-        
         metrics = {
             "timestamp": datetime.utcnow().isoformat(),
-            "system": {
-                "memory_percent": round(memory.percent, 2),
-                "memory_available_mb": round(memory.available / 1024 / 1024, 2),
-                "cpu_percent": round(cpu_percent, 2)
-            },
-            "database": db_stats,
-            "errors": {
-                "total_errors": sum(error_summary.values()),
-                "error_types": error_summary
-            },
             "service": {
                 "uptime_seconds": int((datetime.utcnow() - startup_time).total_seconds()),
-                "version": "2.0.0"
+                "version": "2.0.0",
+                "mode": "simplified" if not UTILS_AVAILABLE else "full"
             }
         }
+        
+        if UTILS_AVAILABLE:
+            try:
+                import psutil
+                
+                # System metrics
+                memory = psutil.virtual_memory()
+                cpu_percent = psutil.cpu_percent(interval=1)
+                
+                # Database metrics
+                db_stats = db_manager.get_connection_stats()
+                
+                # Error metrics
+                try:
+                    from utils import error_tracker
+                    error_summary = error_tracker.get_error_summary()
+                except:
+                    error_summary = {}
+                
+                metrics.update({
+                    "system": {
+                        "memory_percent": round(memory.percent, 2),
+                        "memory_available_mb": round(memory.available / 1024 / 1024, 2),
+                        "cpu_percent": round(cpu_percent, 2)
+                    },
+                    "database": db_stats,
+                    "errors": {
+                        "total_errors": sum(error_summary.values()),
+                        "error_types": error_summary
+                    }
+                })
+            except ImportError:
+                metrics["note"] = "System metrics not available - missing psutil"
         
         return metrics
         
     except Exception as e:
-        logger.error(f"Metrics collection error: {str(e)}", exc_info=True)
+        logger.error(f"Metrics collection error: {str(e)}")
         return {"error": str(e)}
 
 # Additional endpoints for frontend logging and monitoring
