@@ -338,6 +338,19 @@ const Dashboard = () => {
                     </div>
                 </motion.div>
             </div>
+
+            {/* QR Scanner Modal */}
+            <QRScanner
+                isOpen={showQRScanner}
+                onClose={() => setShowQRScanner(false)}
+                onScan={(data) => {
+                    console.log('QR Scan result:', data);
+                    toast.success(`QR Code scanned: ${data}`);
+                    setShowQRScanner(false);
+                    // Navigate to inventory to show the scanned item
+                    navigate('/inventory');
+                }}
+            />
         </Layout>
     );
 };
