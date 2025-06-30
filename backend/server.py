@@ -24,6 +24,9 @@ import asyncio
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Track startup time for uptime calculation
+startup_time = datetime.utcnow()
+
 # Import custom utilities (with fallbacks for Vercel deployment)
 import sys
 import os
