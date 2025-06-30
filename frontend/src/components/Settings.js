@@ -31,15 +31,15 @@ const Settings = () => {
 
     return (
         <Layout currentPage="settings">
-            <div className="space-y-6 h-full overflow-hidden flex flex-col">
+            <div className="space-y-6">
                 {/* Header */}
-                <div>
+                <div className="pb-2">
                     <h1 className="text-4xl font-bold gradient-text mb-2">Settings</h1>
                     <p className="text-slate-600 dark:text-slate-300">Manage your account and system preferences</p>
                 </div>
 
                 {/* Settings Navigation */}
-                <div className="floating-card flex-1 overflow-hidden">
+                <div className="floating-card">
                     <div className="border-b border-slate-200 dark:border-slate-700">
                         <nav className="flex space-x-2 md:space-x-8 px-4 md:px-6 overflow-x-auto scrollbar-hide" aria-label="Settings">
                             {tabs.map((tab) => {
@@ -66,7 +66,7 @@ const Settings = () => {
                     </div>
 
                     {/* Settings Content */}
-                    <div className="p-6 h-full overflow-auto">
+                    <div className="p-4 md:p-6 max-h-[calc(100vh-280px)] md:max-h-[calc(100vh-220px)] overflow-y-auto">
                         {activeTab === 'profile' && <ProfileSettings user={user} />}
                         {activeTab === 'system' && <SystemSettings />}
                         {activeTab === 'notifications' && <NotificationSettings />}
