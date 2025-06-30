@@ -355,9 +355,15 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
 # API Routes
 
 @api_router.post("/auth/login", response_model=LoginResponse)
+@monitor_performance("user_login")
 async def login(request: LoginRequest):
-    """Authenticate user with hardcoded admin credentials"""
+    """Authenticate user with hardcoded admin credentials and enhanced logging"""
     try:
+        logger.info("Login attempt", login_attempt={
+            "username": request.username,
+            "timestamp": datetime.utcnow().isoformat()
+        })
+        
         # Hardcoded uspf credentials as requested
         if request.username == "uspf" and request.password == "uspf":
             # User data for token payload
@@ -380,7 +386,12 @@ async def login(request: LoginRequest):
                 data={"sub": request.username, **user_data}
             )
             
-            logger.info(f"Successful login for user: {request.username}")
+            logger.info("Successful login", login_success={
+                "username": request.username,
+                "user_id": user_data["user_id"],
+                "role": user_data["role"],
+                "department": user_data["department"]
+            })
             
             return LoginResponse(
                 success=True,
@@ -392,16 +403,24 @@ async def login(request: LoginRequest):
                 message="Login successful"
             )
         else:
-            logger.warning(f"Failed login attempt for username: {request.username}")
+            logger.warning("Failed login attempt", login_failure={
+                "username": request.username,
+                "reason": "invalid_credentials",
+                "timestamp": datetime.utcnow().isoformat()
+            })
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid username or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+            
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Login error: {str(e)}")
+        logger.error("Login system error", login_error={
+            "username": request.username,
+            "error": str(e)
+        }, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed"
