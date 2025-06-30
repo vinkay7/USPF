@@ -1019,10 +1019,16 @@ async def detailed_health_check():
 async def health_trends(hours: int = 24):
     """Get health trends over specified time period"""
     try:
-        trends = health_monitor.get_health_trends(hours=hours)
-        return trends
+        if UTILS_AVAILABLE:
+            trends = health_monitor.get_health_trends(hours=hours)
+            return trends
+        else:
+            return {
+                "message": "Health trends not available in simplified mode",
+                "mode": "simplified"
+            }
     except Exception as e:
-        logger.error(f"Health trends error: {str(e)}", exc_info=True)
+        logger.error(f"Health trends error: {str(e)}")
         return {"error": str(e)}
 
 @app.get("/metrics")
