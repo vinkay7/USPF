@@ -24,22 +24,109 @@ import asyncio
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# Import custom utilities
+# Import custom utilities (with fallbacks for Vercel deployment)
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from utils.logger import logger, monitor_performance
-from utils.error_handler import ErrorHandler, graceful_shutdown
-from utils.database import db_manager, with_database_retry
-from utils.health_monitor import health_monitor
-from utils.middleware import (
-    RequestLoggingMiddleware,
-    TimeoutMiddleware,
-    SecurityHeadersMiddleware,
-    RateLimitMiddleware,
-    MemoryMonitoringMiddleware
-)
+try:
+    from utils.logger import logger, monitor_performance
+    from utils.error_handler import ErrorHandler, graceful_shutdown
+    from utils.database import db_manager, with_database_retry
+    from utils.health_monitor import health_monitor
+    from utils.middleware import (
+        RequestLoggingMiddleware,
+        TimeoutMiddleware,
+        SecurityHeadersMiddleware,
+        RateLimitMiddleware,
+        MemoryMonitoringMiddleware
+    )
+    UTILS_AVAILABLE = True
+except ImportError as e:
+    # Fallback logging for Vercel deployment
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger("uspf-inventory")
+    
+    # Fallback implementations
+    def monitor_performance(name):
+        def decorator(func):
+            return func
+        return decorator
+    
+    class ErrorHandler:
+        @staticmethod
+        async def validation_exception_handler(request, exc):
+            from fastapi.responses import JSONResponse
+            from datetime import datetime
+            return JSONResponse(
+                status_code=422,
+                content={
+                    "success": False,
+                    "error": "Validation Error",
+                    "details": exc.errors(),
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+            )
+        
+        @staticmethod
+        async def http_exception_handler(request, exc):
+            from fastapi.responses import JSONResponse
+            from datetime import datetime
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={
+                    "success": False,
+                    "error": exc.detail,
+                    "status_code": exc.status_code,
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+            )
+        
+        @staticmethod
+        async def starlette_exception_handler(request, exc):
+            from fastapi.responses import JSONResponse
+            from datetime import datetime
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={
+                    "success": False,
+                    "error": exc.detail,
+                    "status_code": exc.status_code,
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+            )
+        
+        @staticmethod
+        async def general_exception_handler(request, exc):
+            from fastapi.responses import JSONResponse
+            from datetime import datetime
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "success": False,
+                    "error": "Internal Server Error",
+                    "message": "An unexpected error occurred. Please try again later.",
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+            )
+    
+    class MockDbManager:
+        def __init__(self):
+            self.health_status = {"healthy": True, "last_check": datetime.utcnow().isoformat()}
+        
+        def get_connection_stats(self):
+            return {"status": "mock_mode"}
+    
+    class MockGracefulShutdown:
+        async def shutdown(self, timeout=20):
+            pass
+    
+    db_manager = MockDbManager()
+    graceful_shutdown = MockGracefulShutdown()
+    
+    UTILS_AVAILABLE = False
+    logger.warning("Utils not available - running in simplified mode")
 
 # JWT Configuration
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", secrets.token_urlsafe(32))
