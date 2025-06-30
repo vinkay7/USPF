@@ -495,11 +495,18 @@ async def refresh_token(request: TokenRefreshRequest):
         )
 
 @api_router.get("/inventory", response_model=List[InventoryItem])
+@monitor_performance("get_inventory")
 async def get_inventory(current_user: User = Depends(get_current_user)):
-    """Get all inventory items"""
+    """Get all inventory items with enhanced error handling"""
     try:
+        logger.info("Inventory retrieval requested", user_context={
+            "user_id": current_user.id,
+            "role": current_user.role,
+            "department": current_user.department
+        })
+        
         # In a real implementation, we'd fetch from Supabase
-        # For now, return sample data
+        # For now, return sample data with monitoring
         sample_items = [
             InventoryItem(
                 id="inv-001",
@@ -526,9 +533,19 @@ async def get_inventory(current_user: User = Depends(get_current_user)):
                 created_at=datetime.now()
             )
         ]
+        
+        logger.info("Inventory retrieved successfully", inventory_info={
+            "item_count": len(sample_items),
+            "user": current_user.username
+        })
+        
         return sample_items
+        
     except Exception as e:
-        logger.error(f"Error fetching inventory: {str(e)}")
+        logger.error("Inventory retrieval failed", inventory_error={
+            "user_id": current_user.id,
+            "error": str(e)
+        }, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch inventory"
