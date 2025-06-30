@@ -2,30 +2,107 @@
   "version": 2,
   "buildCommand": "cd frontend && GENERATE_SOURCEMAP=false yarn install && yarn build",
   "outputDirectory": "frontend/build",
-  "installCommand": "cd backend && pip install -r requirements.txt && cd ../frontend && yarn install",
+  "installCommand": "cd frontend && yarn install",
   "functions": {
-    "backend/server.py": {
+    "api/auth/login.py": {
       "runtime": "python3.11",
-      "memory": 1024,
-      "maxDuration": 30
+      "memory": 512,
+      "maxDuration": 15
+    },
+    "api/auth/me.py": {
+      "runtime": "python3.11",
+      "memory": 256,
+      "maxDuration": 10
+    },
+    "api/auth/refresh.py": {
+      "runtime": "python3.11",
+      "memory": 256,
+      "maxDuration": 10
+    },
+    "api/health.py": {
+      "runtime": "python3.11",
+      "memory": 128,
+      "maxDuration": 5
+    },
+    "api/inventory/index.py": {
+      "runtime": "python3.11",
+      "memory": 512,
+      "maxDuration": 20
+    },
+    "api/inventory/create.py": {
+      "runtime": "python3.11",
+      "memory": 512,
+      "maxDuration": 20
+    },
+    "api/inventory/[item_id]/bin-card.py": {
+      "runtime": "python3.11",
+      "memory": 256,
+      "maxDuration": 10
+    },
+    "api/dashboard/stats.py": {
+      "runtime": "python3.11",
+      "memory": 384,
+      "maxDuration": 15
+    },
+    "api/requisitions/index.py": {
+      "runtime": "python3.11",
+      "memory": 512,
+      "maxDuration": 20
+    },
+    "api/reports/low-stock.py": {
+      "runtime": "python3.11",
+      "memory": 256,
+      "maxDuration": 10
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/backend/server.py"
+      "source": "/api/auth/login",
+      "destination": "/api/auth/login.py"
     },
     {
-      "src": "/health",
-      "dest": "/backend/server.py"
+      "source": "/api/auth/me",
+      "destination": "/api/auth/me.py"
     },
     {
-      "src": "/metrics",
-      "dest": "/backend/server.py"
+      "source": "/api/auth/refresh",
+      "destination": "/api/auth/refresh.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "/frontend/build/$1"
+      "source": "/api/health",
+      "destination": "/api/health.py"
+    },
+    {
+      "source": "/api/inventory",
+      "destination": "/api/inventory/index.py"
+    },
+    {
+      "source": "/api/inventory/create",
+      "destination": "/api/inventory/create.py"
+    },
+    {
+      "source": "/api/inventory/([^/]+)",
+      "destination": "/api/inventory/index.py?item_id=$1"
+    },
+    {
+      "source": "/api/inventory/([^/]+)/bin-card",
+      "destination": "/api/inventory/[item_id]/bin-card.py?item_id=$1"
+    },
+    {
+      "source": "/api/dashboard/stats",
+      "destination": "/api/dashboard/stats.py"
+    },
+    {
+      "source": "/api/requisitions",
+      "destination": "/api/requisitions/index.py"
+    },
+    {
+      "source": "/api/reports/low-stock",
+      "destination": "/api/reports/low-stock.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -42,27 +119,33 @@
         },
         {
           "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization, X-Requested-With"
+          "value": "Content-Type, Authorization, X-Requested-With, Accept, Origin"
         },
         {
           "key": "Access-Control-Max-Age",
           "value": "86400"
         },
         {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/static/(.*)",
+      "headers": [
         {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))",
+      "headers": [
         {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
@@ -75,7 +158,7 @@
         },
         {
           "key": "X-Frame-Options",
-          "value": "DENY"
+          "value": "SAMEORIGIN"
         },
         {
           "key": "X-XSS-Protection",
@@ -84,41 +167,16 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "geolocation=(), microphone=(), camera=()"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/backend/server.py"
     }
   ],
   "cleanUrls": true,
   "trailingSlash": false,
   "env": {
-    "REACT_APP_BACKEND_URL": "https://your-app-name.vercel.app",
     "GENERATE_SOURCEMAP": "false",
+    "CI": "false",
     "BABEL_ENV": "production",
-    "NODE_ENV": "production",
-    "SUPABASE_URL": "@supabase_url",
-    "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key",
-    "JWT_SECRET_KEY": "@jwt_secret_key",
-    "ENVIRONMENT": "production"
-  },
-  "build": {
-    "env": {
-      "GENERATE_SOURCEMAP": "false"
-    }
-  },
-  "crons": [
-    {
-      "path": "/api/health/cron",
-      "schedule": "0 12 * * *"
-    }
-  ]
+    "NODE_ENV": "production"
+  }
 }
