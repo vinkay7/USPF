@@ -438,10 +438,28 @@ const Inventory = () => {
                 isOpen={showQRScanner}
                 onClose={() => setShowQRScanner(false)}
                 onScan={(data) => {
-                    // Handle QR scan result
                     console.log('QR Scan result:', data);
+                    toast.success(`QR Code scanned: ${data}`);
                     setShowQRScanner(false);
+                    // You can add logic here to find and highlight the scanned item
                 }}
+            />
+
+            <QRCodeDisplay
+                isOpen={showQRDisplay}
+                onClose={() => {
+                    setShowQRDisplay(false);
+                    setSelectedItem(null);
+                }}
+                data={selectedItem ? {
+                    id: selectedItem.id,
+                    name: selectedItem.name,
+                    category: selectedItem.category,
+                    quantity: selectedItem.quantity,
+                    unit_cost: selectedItem.unit_cost,
+                    department: selectedItem.department
+                } : null}
+                title={`QR Code - ${selectedItem?.name || 'Item'}`}
             />
 
             <QRCodeModal
