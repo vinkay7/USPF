@@ -768,19 +768,128 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
 # Include the router in the main app
 app.include_router(api_router)
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Startup and shutdown events
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup"""
+    try:
+        logger.info("Starting USPF Inventory Management System", startup={
+            "version": "2.0.0",
+            "environment": os.environ.get("ENVIRONMENT", "development"),
+            "jwt_configured": bool(JWT_SECRET_KEY),
+            "supabase_configured": bool(SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY)
+        })
+        
+        # Initialize database connection
+        db_initialized = await db_manager.initialize()
+        if not db_initialized:
+            logger.warning("Database initialization failed - running in degraded mode")
+        
+        logger.info("System startup completed", startup_status={
+            "database_initialized": db_initialized,
+            "health_monitor_active": True
+        })
+        
+    except Exception as e:
+        logger.critical(f"Startup failed: {str(e)}", exc_info=True)
+        raise
 
-# Health check endpoint
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Graceful shutdown"""
+    try:
+        logger.info("Starting graceful shutdown")
+        
+        # Wait for active requests to complete
+        await graceful_shutdown.shutdown(timeout=20)
+        
+        logger.info("Graceful shutdown completed")
+        
+    except Exception as e:
+        logger.error(f"Shutdown error: {str(e)}", exc_info=True)
+
+# Enhanced Health check endpoints
 @app.get("/health")
+@monitor_performance("health_check_basic")
 async def health_check():
-    return {"status": "healthy", "service": "USPF Inventory Management API"}
+    """Basic health check endpoint"""
+    return {
+        "status": "healthy", 
+        "service": "USPF Inventory Management API",
+        "version": "2.0.0",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+@app.get("/health/detailed")
+@monitor_performance("health_check_detailed")
+async def detailed_health_check():
+    """Comprehensive health check with all system components"""
+    try:
+        health_report = await health_monitor.run_all_checks()
+        return health_report
+    except Exception as e:
+        logger.error(f"Health check failed: {str(e)}", exc_info=True)
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+@app.get("/health/trends")
+@monitor_performance("health_trends")
+async def health_trends(hours: int = 24):
+    """Get health trends over specified time period"""
+    try:
+        trends = health_monitor.get_health_trends(hours=hours)
+        return trends
+    except Exception as e:
+        logger.error(f"Health trends error: {str(e)}", exc_info=True)
+        return {"error": str(e)}
+
+@app.get("/metrics")
+@monitor_performance("system_metrics")
+async def system_metrics():
+    """Get system performance metrics"""
+    try:
+        import psutil
+        
+        # System metrics
+        memory = psutil.virtual_memory()
+        cpu_percent = psutil.cpu_percent(interval=1)
+        
+        # Database metrics
+        db_stats = db_manager.get_connection_stats()
+        
+        # Error metrics
+        from utils import error_tracker
+        error_summary = error_tracker.get_error_summary()
+        
+        metrics = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "system": {
+                "memory_percent": round(memory.percent, 2),
+                "memory_available_mb": round(memory.available / 1024 / 1024, 2),
+                "cpu_percent": round(cpu_percent, 2)
+            },
+            "database": db_stats,
+            "errors": {
+                "total_errors": sum(error_summary.values()),
+                "error_types": error_summary
+            },
+            "service": {
+                "uptime_seconds": int((datetime.utcnow() - startup_time).total_seconds()),
+                "version": "2.0.0"
+            }
+        }
+        
+        return metrics
+        
+    except Exception as e:
+        logger.error(f"Metrics collection error: {str(e)}", exc_info=True)
+        return {"error": str(e)}
+
+# Track startup time for uptime calculation
+startup_time = datetime.utcnow()
 
 if __name__ == "__main__":
     import uvicorn
