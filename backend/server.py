@@ -1165,10 +1165,12 @@ async def receive_frontend_error(error_data: Dict[str, Any]):
         }
         
     except Exception as e:
-        logger.error("Frontend error reporting failed", error_processing={
-            "error": str(e),
-            "original_error_id": error_data.get("errorId")
-        }, exc_info=True)
+        logger.error("Frontend error reporting failed", extra={
+            "error_processing": {
+                "error": str(e),
+                "original_error_id": error_data.get("errorId")
+            }
+        })
         return {"success": False, "error": str(e)}
 
 @api_router.get("/health/cron")
