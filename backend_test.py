@@ -9,6 +9,7 @@ import sys
 import os
 import time
 import jwt
+import concurrent.futures
 from dotenv import load_dotenv
 
 # Load environment variables from frontend/.env to get the backend URL
