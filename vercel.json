@@ -104,7 +104,11 @@
     "REACT_APP_BACKEND_URL": "https://your-app-name.vercel.app",
     "GENERATE_SOURCEMAP": "false",
     "BABEL_ENV": "production",
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "SUPABASE_URL": "@supabase_url",
+    "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key",
+    "JWT_SECRET_KEY": "@jwt_secret_key",
+    "ENVIRONMENT": "production"
   },
   "build": {
     "env": {
