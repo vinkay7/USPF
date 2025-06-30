@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import logging
 import uuid
@@ -14,6 +14,9 @@ import io
 import base64
 from supabase import create_client, Client
 import json
+import jwt
+from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
+import secrets
 
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
