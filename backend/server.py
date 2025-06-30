@@ -1155,7 +1155,7 @@ async def receive_frontend_error(error_data: Dict[str, Any]):
         
         logger.error(
             f"Frontend Error: {error_info.get('name', 'Unknown')} - {error_info.get('message', 'No message')}",
-            frontend_error=frontend_error
+            extra={"frontend_error": frontend_error}
         )
         
         return {
