@@ -366,8 +366,8 @@ const SystemSettings = () => {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-1">System Configuration</h3>
                     <p className="text-slate-600 dark:text-slate-400 text-sm">Configure system-wide settings and preferences</p>
@@ -376,7 +376,7 @@ const SystemSettings = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={exportSystemSettings}
-                    className="neumorphic-button px-4 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg flex items-center space-x-2"
+                    className="neumorphic-button px-4 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg flex items-center justify-center space-x-2 w-full sm:w-auto"
                 >
                     <Download className="w-4 h-4" />
                     <span>Export Settings</span>
@@ -385,7 +385,7 @@ const SystemSettings = () => {
 
             <div className="space-y-6">
                 {/* General Settings */}
-                <div className="neumorphic-inset border border-slate-200 dark:border-slate-600 rounded-xl p-6 bg-slate-50/50 dark:bg-slate-700/50">
+                <div className="neumorphic-inset border border-slate-200 dark:border-slate-600 rounded-xl p-4 md:p-6 bg-slate-50/50 dark:bg-slate-700/50">
                     <h4 className="font-medium text-slate-900 dark:text-white mb-4">General Settings</h4>
                     
                     <div className="space-y-4">
@@ -438,7 +438,7 @@ const SystemSettings = () => {
                                 name="lowStockThreshold"
                                 value={settings.lowStockThreshold}
                                 onChange={handleChange}
-                                className="w-32 px-4 py-3 neumorphic-inset bg-slate-50/50 dark:bg-slate-700/50 rounded-xl border-0 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full sm:w-32 px-4 py-3 neumorphic-inset bg-slate-50/50 dark:bg-slate-700/50 rounded-xl border-0 text-slate-800 dark:text-white focus:outline-none"
                                 min="1"
                             />
                             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Alert when stock falls below this number</p>
@@ -447,12 +447,13 @@ const SystemSettings = () => {
                 </div>
             </div>
 
-            <div className="flex justify-end">
+            {/* Mobile-Optimized Save Button */}
+            <div className="flex justify-center sm:justify-end pt-4 border-t border-slate-200 dark:border-slate-700 mt-6">
                 <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleSave}
-                    className="neumorphic-button px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl flex items-center space-x-2"
+                    className="neumorphic-button px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl flex items-center space-x-2 w-full sm:w-auto justify-center"
                 >
                     <Save className="w-4 h-4" />
                     <span>Save Settings</span>
