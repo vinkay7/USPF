@@ -33,6 +33,7 @@ const Inventory = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showQRScanner, setShowQRScanner] = useState(false);
     const [showQRModal, setShowQRModal] = useState(false);
+    const [showQRDisplay, setShowQRDisplay] = useState(false);
     const [showBinCard, setShowBinCard] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [binCardHistory, setBinCardHistory] = useState([]);
