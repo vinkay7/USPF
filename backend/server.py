@@ -782,9 +782,15 @@ async def get_low_stock_items(current_user: User = Depends(get_current_user)):
         )
 
 @api_router.get("/dashboard/stats")
+@monitor_performance("dashboard_stats")
 async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
-    """Get dashboard statistics"""
+    """Get dashboard statistics with monitoring"""
     try:
+        logger.info("Dashboard stats requested", user_context={
+            "user_id": current_user.id,
+            "role": current_user.role
+        })
+        
         stats = {
             "total_items": 150,
             "total_value": 5000000.0,
@@ -806,11 +812,27 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
                     "department": "Corporate Services",
                     "time": "4 hours ago"
                 }
-            ]
+            ],
+            "system_status": {
+                "database_healthy": db_manager.health_status.get("healthy", False),
+                "last_health_check": db_manager.health_status.get("last_check"),
+                "uptime_hours": round((datetime.utcnow() - startup_time).total_seconds() / 3600, 2)
+            }
         }
+        
+        logger.debug("Dashboard stats compiled", stats_info={
+            "user": current_user.username,
+            "total_items": stats["total_items"],
+            "system_healthy": stats["system_status"]["database_healthy"]
+        })
+        
         return stats
+        
     except Exception as e:
-        logger.error(f"Error fetching dashboard stats: {str(e)}")
+        logger.error("Dashboard stats error", dashboard_error={
+            "user_id": current_user.id,
+            "error": str(e)
+        }, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch dashboard stats"
