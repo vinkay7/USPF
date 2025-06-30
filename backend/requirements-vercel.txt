@@ -1,0 +1,32 @@
+# Optimized requirements for Vercel deployment
+# Core FastAPI and dependencies
+fastapi==0.110.1
+uvicorn[standard]==0.25.0
+
+# Essential utilities
+python-dotenv>=1.0.1
+pydantic>=2.6.4
+python-multipart>=0.0.9
+
+# Authentication
+pyjwt[crypto]>=2.10.1
+cryptography>=42.0.8
+python-jose>=3.3.0
+passlib>=1.7.4
+
+# Database
+supabase>=2.8.1
+httpx>=0.26.0
+postgrest>=0.19.0
+gotrue>=2.12.2
+
+# Image processing (lightweight)
+qrcode>=7.4.2
+Pillow>=10.0.0
+
+# System monitoring
+psutil>=5.9.0
+
+# Essential packages only for Vercel
+requests>=2.31.0
+typing-extensions>=4.8.0
