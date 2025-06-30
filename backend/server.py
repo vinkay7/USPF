@@ -906,9 +906,10 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
                 }
             ],
             "system_status": {
-                "database_healthy": db_manager.health_status.get("healthy", False),
+                "database_healthy": db_manager.health_status.get("healthy", True),
                 "last_health_check": db_manager.health_status.get("last_check"),
-                "uptime_hours": round((datetime.utcnow() - startup_time).total_seconds() / 3600, 2)
+                "uptime_hours": round((datetime.utcnow() - startup_time).total_seconds() / 3600, 2),
+                "utils_available": UTILS_AVAILABLE
             }
         }
         
