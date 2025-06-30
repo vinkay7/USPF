@@ -65,9 +65,20 @@ class LoginRequest(BaseModel):
 
 class LoginResponse(BaseModel):
     success: bool
-    token: str
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int
     user: Dict[str, Any]
     message: str
+
+class TokenRefreshRequest(BaseModel):
+    refresh_token: str
+
+class TokenRefreshResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int
 
 class InventoryItem(BaseModel):
     id: Optional[str] = None
