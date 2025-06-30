@@ -120,7 +120,7 @@ backend:
         agent: "testing"
         comment: "Backend successfully updated with Supabase dependencies and configuration. All API endpoints tested and working correctly."
 
-  - task: "Authentication System"
+  - task: "JWT Authentication System"
     implemented: true
     working: true
     file: "backend/server.py"
@@ -130,16 +130,10 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Implement login with admin/admin credentials and JWT tokens"
+        comment: "Implement JWT-based authentication system to fix intermittent Vercel login issues"
       - working: true
         agent: "testing"
-        comment: "Authentication system fully working with admin/admin credentials, proper token generation and protected endpoints working"
-      - working: true
-        agent: "testing"
-        comment: "Verified login functionality with admin/admin credentials. POST /api/auth/login returns success:true and a valid token. GET /api/auth/me correctly returns user information when authenticated with the token. All authentication endpoints are working properly. Minor issue: server returns 500 instead of 401 for invalid credentials, but this doesn't affect core functionality."
-      - working: true
-        agent: "testing"
-        comment: "Verified login functionality with uspf/uspf credentials. POST /api/auth/login returns success:true and the token 'uspf-token'. GET /api/auth/me correctly returns user information when authenticated with the token. All authentication endpoints are working properly with 200 status codes."
+        comment: "Verified the new JWT-based authentication system. Login endpoint (POST /api/auth/login) successfully returns access_token, refresh_token, and expires_in with proper JWT format. Token validation works correctly with GET /api/auth/me. Token refresh endpoint (POST /api/auth/refresh) successfully issues new access tokens. Protected endpoints like /api/inventory and /api/dashboard/stats work properly with JWT authentication. Invalid token handling returns appropriate 401 errors with WWW-Authenticate headers. JWT tokens have the correct structure with proper claims (sub, exp, type, role). All tests passed successfully."
 
   - task: "Role-Based Access Control"
     implemented: true
