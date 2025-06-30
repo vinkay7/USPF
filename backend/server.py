@@ -1123,10 +1123,12 @@ async def receive_frontend_logs(logs_data: Dict[str, Any]):
         return {"success": True, "processed": len(logs)}
         
     except Exception as e:
-        logger.error("Frontend log processing failed", frontend_log_error={
-            "error": str(e),
-            "logs_count": len(logs_data.get("logs", []))
-        }, exc_info=True)
+        logger.error("Frontend log processing failed", extra={
+            "frontend_log_error": {
+                "error": str(e),
+                "logs_count": len(logs_data.get("logs", []))
+            }
+        })
         return {"success": False, "error": str(e)}
 
 @api_router.post("/errors/frontend")
