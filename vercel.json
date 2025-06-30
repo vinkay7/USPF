@@ -132,7 +132,7 @@
       ]
     },
     {
-      "source": "/static/*",
+      "source": "/static/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
