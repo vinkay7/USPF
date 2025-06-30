@@ -186,8 +186,9 @@ class User(BaseModel):
     full_name: Optional[str] = None
 
 # Helper Functions
+@monitor_performance("jwt_token_creation")
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """Create JWT access token"""
+    """Create JWT access token with monitoring"""
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -196,38 +197,76 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     
     to_encode.update({"exp": expire, "type": "access"})
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    
+    logger.info("Access token created", token_info={
+        "user": data.get("username", "unknown"),
+        "expires": expire.isoformat(),
+        "type": "access"
+    })
+    
     return encoded_jwt
 
+@monitor_performance("jwt_refresh_token_creation")
 def create_refresh_token(data: dict) -> str:
-    """Create JWT refresh token"""
+    """Create JWT refresh token with monitoring"""
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire, "type": "refresh"})
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    
+    logger.info("Refresh token created", token_info={
+        "user": data.get("username", "unknown"),
+        "expires": expire.isoformat(),
+        "type": "refresh"
+    })
+    
     return encoded_jwt
 
+@monitor_performance("jwt_token_verification")
 def verify_token(token: str, token_type: str = "access") -> dict:
-    """Verify and decode JWT token"""
+    """Verify and decode JWT token with enhanced error handling"""
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         if payload.get("type") != token_type:
+            logger.warning("Invalid token type", token_validation={
+                "expected_type": token_type,
+                "actual_type": payload.get("type"),
+                "user": payload.get("sub", "unknown")
+            })
             raise InvalidTokenError("Invalid token type")
+            
+        logger.debug("Token verified successfully", token_info={
+            "user": payload.get("sub", "unknown"),
+            "type": token_type,
+            "expires": payload.get("exp")
+        })
+        
         return payload
+        
     except ExpiredSignatureError:
+        logger.warning("Expired token attempted", token_validation={
+            "type": token_type,
+            "error": "expired"
+        })
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token has expired",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    except InvalidTokenError:
+    except InvalidTokenError as e:
+        logger.warning("Invalid token attempted", token_validation={
+            "type": token_type,
+            "error": str(e)
+        })
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+@monitor_performance("qr_code_generation")
 def generate_qr_code(data: dict) -> str:
-    """Generate QR code for inventory item"""
+    """Generate QR code for inventory item with error handling"""
     try:
         qr = qrcode.QRCode(
             version=1,
@@ -245,14 +284,26 @@ def generate_qr_code(data: dict) -> str:
         
         # Convert to base64
         img_base64 = base64.b64encode(img_buffer.getvalue()).decode()
+        
+        logger.debug("QR code generated", qr_info={
+            "data_keys": list(data.keys()),
+            "data_size": len(json.dumps(data))
+        })
+        
         return f"data:image/png;base64,{img_base64}"
+        
     except Exception as e:
-        logger.error(f"Error generating QR code: {str(e)}")
+        logger.error(f"Error generating QR code: {str(e)}", qr_error={
+            "data": data,
+            "error": str(e)
+        }, exc_info=True)
         return ""
 
+@monitor_performance("user_authentication")
 async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)) -> User:
-    """Get current user from JWT token"""
+    """Get current user from JWT token with enhanced logging"""
     if not credentials:
+        logger.warning("Authentication attempted without credentials")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required",
@@ -264,6 +315,7 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
         payload = verify_token(credentials.credentials, "access")
         username = payload.get("sub")
         if username is None:
+            logger.warning("Token missing username", token_payload=payload)
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid authentication credentials",
@@ -271,7 +323,7 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
             )
         
         # Return user data from token payload
-        return User(
+        user = User(
             id=payload.get("user_id", "uspf-001"),
             username=username,
             role=payload.get("role", "admin"),
@@ -279,10 +331,21 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
             full_name=payload.get("full_name", "USPF Administrator")
         )
         
+        logger.debug("User authenticated", user_info={
+            "username": user.username,
+            "role": user.role,
+            "department": user.department
+        })
+        
+        return user
+        
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Token validation error: {str(e)}")
+        logger.error(f"Token validation error: {str(e)}", auth_error={
+            "error": str(e),
+            "token_preview": credentials.credentials[:20] + "..." if len(credentials.credentials) > 20 else credentials.credentials
+        }, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
