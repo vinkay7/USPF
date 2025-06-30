@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import QRCode from 'qrcode';
 
-const QRCodeDisplay = ({ isOpen, onClose, data, title = "QR Code" }) => {
+const QRCodeDisplay = ({ isOpen, onClose, data, title = "QR Code", qrCodeImage: existingQRCode }) => {
     const [qrCodeImage, setQrCodeImage] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
 
