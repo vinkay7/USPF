@@ -297,10 +297,10 @@ class USPFInventoryAPITest(unittest.TestCase):
         self.assertIn("requested_quantity", first_req, "Requisition should have a requested quantity")
         self.assertIn("status", first_req, "Requisition should have a status")
     
-    def test_08_create_requisition(self):
+    def test_11_create_requisition(self):
         """Test creating a new requisition"""
         # Use the item ID from the create test, or a sample ID if not available
-        item_id = getattr(self, 'item_id', "inv-001")
+        item_id = self.__class__.item_id or "inv-001"
         
         new_requisition = {
             "item_id": item_id,
@@ -327,7 +327,7 @@ class USPFInventoryAPITest(unittest.TestCase):
         self.requisition_id = created_req.get("id")
         print(f"Created requisition with ID: {self.requisition_id}")
     
-    def test_09_dashboard_stats(self):
+    def test_12_dashboard_stats(self):
         """Test getting dashboard statistics"""
         response = requests.get(f"{API_URL}/dashboard/stats", headers=self.get_auth_headers())
         
@@ -349,7 +349,7 @@ class USPFInventoryAPITest(unittest.TestCase):
             self.assertIn("item", first_activity, "Activity should have an item name")
             self.assertIn("quantity", first_activity, "Activity should have a quantity")
     
-    def test_10_low_stock_report(self):
+    def test_13_low_stock_report(self):
         """Test getting low stock report"""
         response = requests.get(f"{API_URL}/reports/low-stock", headers=self.get_auth_headers())
         
@@ -373,7 +373,7 @@ class USPFInventoryAPITest(unittest.TestCase):
                 "Low stock item quantity should be less than reorder level"
             )
     
-    def test_11_health_check(self):
+    def test_14_health_check(self):
         """Test health check endpoint (no authentication required)"""
         try:
             # Note: The health endpoint is at /health (not /api/health)
@@ -400,16 +400,19 @@ if __name__ == "__main__":
     # Run all tests to comprehensively check all API endpoints
     suite = unittest.TestSuite()
     suite.addTest(USPFInventoryAPITest('test_01_login'))         # Login endpoint
-    suite.addTest(USPFInventoryAPITest('test_02_get_current_user'))  # Get current user
-    suite.addTest(USPFInventoryAPITest('test_03_get_inventory'))  # Get inventory
-    suite.addTest(USPFInventoryAPITest('test_04_create_inventory_item'))  # Create inventory item
-    suite.addTest(USPFInventoryAPITest('test_05_update_inventory_item'))  # Update inventory item
-    suite.addTest(USPFInventoryAPITest('test_06_get_bin_card_history'))  # Get BIN card history
-    suite.addTest(USPFInventoryAPITest('test_07_get_requisitions'))  # Get requisitions
-    suite.addTest(USPFInventoryAPITest('test_08_create_requisition'))  # Create requisition
-    suite.addTest(USPFInventoryAPITest('test_09_dashboard_stats'))  # Get dashboard stats
-    suite.addTest(USPFInventoryAPITest('test_10_low_stock_report'))  # Get low stock report
-    suite.addTest(USPFInventoryAPITest('test_11_health_check'))  # Health check endpoint
+    suite.addTest(USPFInventoryAPITest('test_02_token_validation'))  # Token validation
+    suite.addTest(USPFInventoryAPITest('test_03_token_refresh'))  # Token refresh
+    suite.addTest(USPFInventoryAPITest('test_04_invalid_token_handling'))  # Invalid token handling
+    suite.addTest(USPFInventoryAPITest('test_05_protected_endpoints'))  # Protected endpoints
+    suite.addTest(USPFInventoryAPITest('test_06_get_inventory'))  # Get inventory
+    suite.addTest(USPFInventoryAPITest('test_07_create_inventory_item'))  # Create inventory item
+    suite.addTest(USPFInventoryAPITest('test_08_update_inventory_item'))  # Update inventory item
+    suite.addTest(USPFInventoryAPITest('test_09_get_bin_card_history'))  # Get BIN card history
+    suite.addTest(USPFInventoryAPITest('test_10_get_requisitions'))  # Get requisitions
+    suite.addTest(USPFInventoryAPITest('test_11_create_requisition'))  # Create requisition
+    suite.addTest(USPFInventoryAPITest('test_12_dashboard_stats'))  # Get dashboard stats
+    suite.addTest(USPFInventoryAPITest('test_13_low_stock_report'))  # Get low stock report
+    suite.addTest(USPFInventoryAPITest('test_14_health_check'))  # Health check endpoint
     
     # Run the tests
     runner = unittest.TextTestRunner(verbosity=2)
