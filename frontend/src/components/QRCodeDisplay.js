@@ -18,8 +18,14 @@ const QRCodeDisplay = ({ isOpen, onClose, data, title = "QR Code" }) => {
     const generateQRCode = async () => {
         setIsGenerating(true);
         try {
-            // Use QR code generation API or library
-            const QRCode = await import('qrcode');
+            console.log('Generating QR code for data:', data);
+            
+            // Check if data exists
+            if (!data) {
+                throw new Error('No data provided for QR code generation');
+            }
+            
+            // Generate QR code using imported QRCode library
             const qrCodeDataURL = await QRCode.toDataURL(JSON.stringify(data), {
                 width: 300,
                 margin: 2,
@@ -29,10 +35,12 @@ const QRCodeDisplay = ({ isOpen, onClose, data, title = "QR Code" }) => {
                 },
                 errorCorrectionLevel: 'M'
             });
+            
+            console.log('QR code generated successfully');
             setQrCodeImage(qrCodeDataURL);
         } catch (error) {
             console.error('Error generating QR code:', error);
-            toast.error('Failed to generate QR code');
+            toast.error(`Failed to generate QR code: ${error.message}`);
         } finally {
             setIsGenerating(false);
         }
