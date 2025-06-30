@@ -17,6 +17,7 @@ import {
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
+import QRScanner from './QRScanner';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '../context/NavigationContext';
