@@ -6,19 +6,49 @@ import Login from './components/Login';
 import AppRouter from './components/Router';
 import SplashScreen from './components/SplashScreen';
 import NavigationSplashScreen from './components/NavigationSplashScreen';
+import ErrorBoundary from './components/ErrorBoundary';
+import logger, { createApiInterceptor, useLogger } from './utils/logger';
 import './App.css';
 
+// Initialize API interceptor for automatic logging
+createApiInterceptor();
+
 const AppContent = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const { showNavigationSplash, pendingNavigation } = useNavigation();
+  const { trackPageView } = useLogger();
   const [showSplash, setShowSplash] = useState(true);
   const [showPostLoginSplash, setShowPostLoginSplash] = useState(false);
   const [wasLoggedIn, setWasLoggedIn] = useState(false);
+
+  // Set user ID in logger when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      logger.setUserId(user.id);
+      logger.info('User authenticated', {
+        user_id: user.id,
+        username: user.username,
+        role: user.role,
+        department: user.department
+      });
+    } else if (!isAuthenticated) {
+      logger.setUserId(null);
+    }
+  }, [isAuthenticated, user]);
+
+  // Track page views
+  useEffect(() => {
+    trackPageView(window.location.pathname, {
+      authenticated: isAuthenticated,
+      loading: isLoading
+    });
+  }, [isAuthenticated, isLoading, trackPageView]);
 
   useEffect(() => {
     // Hide initial splash screen after it completes
     const timer = setTimeout(() => {
       setShowSplash(false);
+      logger.info('Initial splash screen completed');
     }, 4000);
 
     return () => clearTimeout(timer);
@@ -28,6 +58,7 @@ const AppContent = () => {
   useEffect(() => {
     if (isAuthenticated && !wasLoggedIn && !showSplash) {
       setShowPostLoginSplash(true);
+      logger.info('Post-login splash screen triggered');
       setWasLoggedIn(true);
       
       // Hide post-login splash after 2 seconds
