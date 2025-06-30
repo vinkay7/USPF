@@ -35,12 +35,12 @@ def test_login():
             login_response = response.json()
             print(f"Response: {json.dumps(login_response, indent=2)}")
             
-            # Check if response contains success and token
-            if login_response.get("success") and login_response.get("token"):
-                print("✅ Login successful! Token received.")
-                return login_response.get("token")
+            # Check if response contains success and access_token
+            if login_response.get("success") and login_response.get("access_token"):
+                print("✅ Login successful! JWT tokens received.")
+                return login_response.get("access_token")
             else:
-                print("❌ Login failed: Response doesn't contain success=true or token")
+                print("❌ Login failed: Response doesn't contain success=true or access_token")
                 return None
         else:
             print(f"❌ Login failed with status code {response.status_code}")
