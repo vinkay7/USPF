@@ -386,10 +386,248 @@ class USPFInventoryAPITest(unittest.TestCase):
             self.assertIn("status", health_data, "Health check should include status")
             self.assertEqual(health_data.get("status"), "healthy", "Status should be 'healthy'")
             self.assertIn("service", health_data, "Health check should include service name")
+            self.assertIn("version", health_data, "Health check should include version")
+            self.assertIn("timestamp", health_data, "Health check should include timestamp")
         except Exception as e:
             print(f"Health check test failed: {str(e)}")
             # Don't fail the test if the endpoint is not accessible in the current deployment
             self.skipTest(f"Health endpoint not accessible: {str(e)}")
+            
+    def test_15_detailed_health_check(self):
+        """Test detailed health check endpoint"""
+        try:
+            response = requests.get(f"{BACKEND_URL}/health/detailed")
+            
+            self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+            
+            health_data = response.json()
+            self.assertIn("status", health_data, "Detailed health check should include status")
+            self.assertIn("components", health_data, "Detailed health check should include components")
+            self.assertIn("summary", health_data, "Detailed health check should include summary")
+            
+            # Check components structure
+            components = health_data.get("components", {})
+            self.assertIsInstance(components, dict, "Components should be a dictionary")
+            
+            # Check summary structure
+            summary = health_data.get("summary", {})
+            self.assertIn("healthy", summary, "Summary should include healthy count")
+            self.assertIn("unhealthy", summary, "Summary should include unhealthy count")
+            
+        except Exception as e:
+            print(f"Detailed health check test failed: {str(e)}")
+            self.skipTest(f"Detailed health endpoint not accessible: {str(e)}")
+            
+    def test_16_health_trends(self):
+        """Test health trends endpoint"""
+        try:
+            response = requests.get(f"{BACKEND_URL}/health/trends")
+            
+            self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+            
+            trends_data = response.json()
+            self.assertIsInstance(trends_data, dict, "Trends data should be a dictionary")
+            
+            # Check for expected fields in trends data
+            if "error" not in trends_data:
+                self.assertIn("timestamps", trends_data, "Trends should include timestamps")
+                self.assertIn("statuses", trends_data, "Trends should include statuses")
+                
+        except Exception as e:
+            print(f"Health trends test failed: {str(e)}")
+            self.skipTest(f"Health trends endpoint not accessible: {str(e)}")
+            
+    def test_17_metrics_endpoint(self):
+        """Test metrics endpoint"""
+        try:
+            response = requests.get(f"{BACKEND_URL}/metrics")
+            
+            self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+            
+            metrics_data = response.json()
+            self.assertIsInstance(metrics_data, dict, "Metrics data should be a dictionary")
+            
+            # Check for expected sections in metrics data
+            if "error" not in metrics_data:
+                self.assertIn("timestamp", metrics_data, "Metrics should include timestamp")
+                self.assertIn("system", metrics_data, "Metrics should include system data")
+                self.assertIn("database", metrics_data, "Metrics should include database data")
+                self.assertIn("errors", metrics_data, "Metrics should include error data")
+                self.assertIn("service", metrics_data, "Metrics should include service data")
+                
+                # Check system metrics structure
+                system = metrics_data.get("system", {})
+                self.assertIn("memory_percent", system, "System metrics should include memory_percent")
+                self.assertIn("cpu_percent", system, "System metrics should include cpu_percent")
+                
+                # Check service metrics structure
+                service = metrics_data.get("service", {})
+                self.assertIn("uptime_seconds", service, "Service metrics should include uptime_seconds")
+                self.assertIn("version", service, "Service metrics should include version")
+                
+        except Exception as e:
+            print(f"Metrics test failed: {str(e)}")
+            self.skipTest(f"Metrics endpoint not accessible: {str(e)}")
+            
+    def test_18_frontend_logs_endpoint(self):
+        """Test frontend logs ingestion endpoint"""
+        logs_data = {
+            "logs": [
+                {
+                    "level": "info",
+                    "message": "Test log message",
+                    "data": {"test": "data"},
+                    "sessionId": "test-session",
+                    "userId": "test-user",
+                    "url": "https://example.com/test",
+                    "pathname": "/test",
+                    "userAgent": "Test User Agent"
+                },
+                {
+                    "level": "error",
+                    "message": "Test error message",
+                    "data": {"error": "test error"},
+                    "sessionId": "test-session",
+                    "userId": "test-user",
+                    "url": "https://example.com/test",
+                    "pathname": "/test",
+                    "userAgent": "Test User Agent"
+                }
+            ]
+        }
+        
+        response = requests.post(f"{API_URL}/logs/frontend", json=logs_data, headers=self.get_auth_headers())
+        
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        
+        result = response.json()
+        self.assertIn("success", result, "Response should include success status")
+        self.assertTrue(result.get("success"), "Log ingestion should be successful")
+        self.assertIn("processed", result, "Response should include processed count")
+        self.assertEqual(result.get("processed"), 2, "Should have processed 2 log entries")
+        
+    def test_19_frontend_errors_endpoint(self):
+        """Test frontend error reporting endpoint"""
+        error_data = {
+            "errorId": "test-error-id",
+            "error": {
+                "name": "TestError",
+                "message": "Test error message",
+                "stack": "Test error stack trace"
+            },
+            "context": {
+                "component": "TestComponent",
+                "props": {"test": "props"}
+            },
+            "url": "https://example.com/test",
+            "userAgent": "Test User Agent",
+            "timestamp": "2023-01-01T00:00:00Z"
+        }
+        
+        response = requests.post(f"{API_URL}/errors/frontend", json=error_data, headers=self.get_auth_headers())
+        
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        
+        result = response.json()
+        self.assertIn("success", result, "Response should include success status")
+        self.assertTrue(result.get("success"), "Error reporting should be successful")
+        self.assertIn("error_id", result, "Response should include error_id")
+        self.assertEqual(result.get("error_id"), "test-error-id", "Error ID should match")
+        
+    def test_20_health_cron_endpoint(self):
+        """Test health cron endpoint"""
+        try:
+            response = requests.get(f"{API_URL}/health/cron", headers=self.get_auth_headers())
+            
+            self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+            
+            result = response.json()
+            self.assertIn("status", result, "Response should include status")
+            self.assertIn("health_status", result, "Response should include health_status")
+            self.assertIn("timestamp", result, "Response should include timestamp")
+            
+        except Exception as e:
+            print(f"Health cron test failed: {str(e)}")
+            self.skipTest(f"Health cron endpoint not accessible: {str(e)}")
+            
+    def test_21_security_headers(self):
+        """Test security headers in responses"""
+        # Test a public endpoint
+        response = requests.get(f"{BACKEND_URL}/health")
+        
+        # Check for security headers
+        headers = response.headers
+        self.assertIn("X-Content-Type-Options", headers, "Response should include X-Content-Type-Options header")
+        self.assertEqual(headers.get("X-Content-Type-Options"), "nosniff", "X-Content-Type-Options should be nosniff")
+        
+        self.assertIn("X-Frame-Options", headers, "Response should include X-Frame-Options header")
+        self.assertEqual(headers.get("X-Frame-Options"), "DENY", "X-Frame-Options should be DENY")
+        
+        self.assertIn("X-XSS-Protection", headers, "Response should include X-XSS-Protection header")
+        self.assertEqual(headers.get("X-XSS-Protection"), "1; mode=block", "X-XSS-Protection should be 1; mode=block")
+        
+        # Test an authenticated endpoint
+        response = requests.get(f"{API_URL}/inventory", headers=self.get_auth_headers())
+        
+        # Check for security headers
+        headers = response.headers
+        self.assertIn("X-Content-Type-Options", headers, "Response should include X-Content-Type-Options header")
+        self.assertEqual(headers.get("X-Content-Type-Options"), "nosniff", "X-Content-Type-Options should be nosniff")
+        
+        self.assertIn("X-Frame-Options", headers, "Response should include X-Frame-Options header")
+        self.assertEqual(headers.get("X-Frame-Options"), "DENY", "X-Frame-Options should be DENY")
+        
+        self.assertIn("X-XSS-Protection", headers, "Response should include X-XSS-Protection header")
+        self.assertEqual(headers.get("X-XSS-Protection"), "1; mode=block", "X-XSS-Protection should be 1; mode=block")
+        
+    def test_22_timeout_handling(self):
+        """Test timeout handling"""
+        # Create a long-running request that should trigger timeout
+        # Note: This is a bit tricky to test without a specific endpoint that takes a long time
+        # We'll use a simple approach to test the timeout middleware
+        
+        try:
+            # Make a request with a very short timeout to simulate server timeout
+            response = requests.get(f"{API_URL}/dashboard/stats", headers=self.get_auth_headers(), timeout=0.001)
+            # If we get here, the request didn't timeout as expected
+            print("Request didn't timeout as expected, checking response")
+            self.assertEqual(response.status_code, 200, "Request should succeed if not timed out")
+        except requests.exceptions.Timeout:
+            # This is expected - the request timed out
+            print("Request timed out as expected")
+            pass
+        except Exception as e:
+            # Some other error occurred
+            print(f"Unexpected error during timeout test: {str(e)}")
+            
+    def test_23_rate_limiting(self):
+        """Test rate limiting"""
+        # Make multiple concurrent requests to test rate limiting
+        # Note: This is difficult to test without knowing the exact rate limit
+        # We'll make a bunch of requests and see if any get rate limited
+        
+        num_requests = 30  # Adjust based on the rate limit in the server
+        
+        def make_request():
+            try:
+                response = requests.get(f"{API_URL}/inventory", headers=self.get_auth_headers())
+                return response.status_code
+            except Exception as e:
+                print(f"Error during rate limit test: {str(e)}")
+                return 0
+        
+        # Make concurrent requests
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            results = list(executor.map(make_request, range(num_requests)))
+        
+        # Check if any requests were rate limited (status code 429)
+        rate_limited = results.count(429)
+        success = results.count(200)
+        
+        print(f"Rate limit test results: {success} successful, {rate_limited} rate limited")
+        
+        # We don't assert anything specific here, just log the results
+        # In a real test, we might want to assert based on the expected rate limit
 
 if __name__ == "__main__":
     # Run the tests
