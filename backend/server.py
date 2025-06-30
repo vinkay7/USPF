@@ -964,6 +964,124 @@ async def system_metrics():
 # Track startup time for uptime calculation
 startup_time = datetime.utcnow()
 
+# Additional endpoints for frontend logging and monitoring
+@api_router.post("/logs/frontend")
+@monitor_performance("frontend_log_ingestion")
+async def receive_frontend_logs(logs_data: Dict[str, Any]):
+    """Receive and process frontend logs"""
+    try:
+        logs = logs_data.get("logs", [])
+        
+        for log_entry in logs:
+            # Process each log entry
+            level = log_entry.get("level", "info").upper()
+            message = log_entry.get("message", "")
+            data = log_entry.get("data", {})
+            
+            # Enhanced log entry with frontend context
+            frontend_log_data = {
+                "source": "frontend",
+                "session_id": log_entry.get("sessionId"),
+                "user_id": log_entry.get("userId"),
+                "url": log_entry.get("url"),
+                "pathname": log_entry.get("pathname"),
+                "user_agent": log_entry.get("userAgent"),
+                "performance": log_entry.get("performance"),
+                "data": data
+            }
+            
+            # Log based on level
+            if level == "ERROR":
+                logger.error(f"Frontend: {message}", frontend_error=frontend_log_data)
+            elif level == "WARN":
+                logger.warning(f"Frontend: {message}", frontend_warning=frontend_log_data)
+            elif level == "INFO":
+                logger.info(f"Frontend: {message}", frontend_info=frontend_log_data)
+            else:
+                logger.debug(f"Frontend: {message}", frontend_debug=frontend_log_data)
+        
+        return {"success": True, "processed": len(logs)}
+        
+    except Exception as e:
+        logger.error("Frontend log processing failed", frontend_log_error={
+            "error": str(e),
+            "logs_count": len(logs_data.get("logs", []))
+        }, exc_info=True)
+        return {"success": False, "error": str(e)}
+
+@api_router.post("/errors/frontend")
+@monitor_performance("frontend_error_reporting")
+async def receive_frontend_error(error_data: Dict[str, Any]):
+    """Receive and process frontend error reports"""
+    try:
+        # Extract error information
+        error_info = error_data.get("error", {})
+        context = error_data.get("context", {})
+        
+        # Create structured error log
+        frontend_error = {
+            "source": "frontend",
+            "error_id": error_data.get("errorId"),
+            "error_name": error_info.get("name"),
+            "error_message": error_info.get("message"),
+            "error_stack": error_info.get("stack"),
+            "url": error_data.get("url"),
+            "user_agent": error_data.get("userAgent"),
+            "timestamp": error_data.get("timestamp"),
+            "context": context
+        }
+        
+        logger.error(
+            f"Frontend Error: {error_info.get('name', 'Unknown')} - {error_info.get('message', 'No message')}",
+            frontend_error=frontend_error
+        )
+        
+        return {
+            "success": True,
+            "error_id": error_data.get("errorId"),
+            "message": "Error report received"
+        }
+        
+    except Exception as e:
+        logger.error("Frontend error reporting failed", error_processing={
+            "error": str(e),
+            "original_error_id": error_data.get("errorId")
+        }, exc_info=True)
+        return {"success": False, "error": str(e)}
+
+@api_router.get("/health/cron")
+@monitor_performance("health_cron_check")
+async def health_cron_check():
+    """Cron job endpoint for regular health monitoring"""
+    try:
+        # Run comprehensive health check
+        health_report = await health_monitor.run_all_checks()
+        
+        # Log health status
+        if health_report["status"] != "healthy":
+            logger.warning("Scheduled health check found issues", health_cron=health_report)
+        else:
+            logger.info("Scheduled health check passed", health_cron={
+                "status": health_report["status"],
+                "checks_passed": health_report["summary"]["healthy"]
+            })
+        
+        return {
+            "status": "completed",
+            "health_status": health_report["status"],
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error("Health cron check failed", cron_error={
+            "error": str(e)
+        }, exc_info=True)
+        return {
+            "status": "failed",
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
