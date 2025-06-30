@@ -151,12 +151,13 @@ app = FastAPI(
     redoc_url="/redoc" if os.environ.get("ENVIRONMENT") != "production" else None
 )
 
-# Add custom middleware in correct order (last added = first executed)
-app.add_middleware(MemoryMonitoringMiddleware)
-app.add_middleware(SecurityHeadersMiddleware)
-app.add_middleware(RateLimitMiddleware, requests_per_minute=120)  # Increased for admin use
-app.add_middleware(TimeoutMiddleware, timeout_seconds=25)  # 25s for Vercel 30s limit
-app.add_middleware(RequestLoggingMiddleware)
+# Add custom middleware only if utils are available
+if UTILS_AVAILABLE:
+    app.add_middleware(MemoryMonitoringMiddleware)
+    app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(RateLimitMiddleware, requests_per_minute=120)
+    app.add_middleware(TimeoutMiddleware, timeout_seconds=25)
+    app.add_middleware(RequestLoggingMiddleware)
 
 # Add CORS middleware (should be last)
 app.add_middleware(
