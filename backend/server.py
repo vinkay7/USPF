@@ -1,13 +1,14 @@
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from dotenv import load_dotenv
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 import os
-import logging
 import uuid
 import qrcode
 import io
@@ -17,10 +18,27 @@ import json
 import jwt
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 import secrets
+import asyncio
 
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Import custom utilities
+from utils import (
+    logger, 
+    monitor_performance,
+    ErrorHandler,
+    db_manager,
+    with_database_retry,
+    health_monitor,
+    RequestLoggingMiddleware,
+    TimeoutMiddleware,
+    SecurityHeadersMiddleware,
+    RateLimitMiddleware,
+    MemoryMonitoringMiddleware,
+    graceful_shutdown
+)
 
 # JWT Configuration
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", secrets.token_urlsafe(32))
@@ -33,30 +51,45 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+    logger.critical("Missing Supabase configuration", config={"url_present": bool(SUPABASE_URL), "key_present": bool(SUPABASE_SERVICE_ROLE_KEY)})
     raise ValueError("Missing Supabase configuration. Please check your .env file.")
 
-# Initialize Supabase client
-# supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-
-# Create the main app without a prefix
+# Create the main app with enhanced configuration
 app = FastAPI(
     title="USPF Inventory Management System",
-    description="Progressive Web App for managing inventory at Universal Service Provision Fund",
-    version="1.0.0"
+    description="Progressive Web App for managing inventory at Universal Service Provision Fund - Production Ready",
+    version="2.0.0",
+    docs_url="/docs" if os.environ.get("ENVIRONMENT") != "production" else None,
+    redoc_url="/redoc" if os.environ.get("ENVIRONMENT") != "production" else None
 )
+
+# Add custom middleware in correct order (last added = first executed)
+app.add_middleware(MemoryMonitoringMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RateLimitMiddleware, requests_per_minute=120)  # Increased for admin use
+app.add_middleware(TimeoutMiddleware, timeout_seconds=25)  # 25s for Vercel 30s limit
+app.add_middleware(RequestLoggingMiddleware)
+
+# Add CORS middleware (should be last)
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Register exception handlers
+app.add_exception_handler(RequestValidationError, ErrorHandler.validation_exception_handler)
+app.add_exception_handler(HTTPException, ErrorHandler.http_exception_handler)
+app.add_exception_handler(StarletteHTTPException, ErrorHandler.starlette_exception_handler)
+app.add_exception_handler(Exception, ErrorHandler.general_exception_handler)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
 # Security
 security = HTTPBearer(auto_error=False)
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 # Pydantic Models
 class LoginRequest(BaseModel):
