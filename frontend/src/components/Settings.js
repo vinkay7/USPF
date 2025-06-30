@@ -76,6 +76,10 @@ const Settings = () => {
                         {activeTab === 'system' && <SystemSettings />}
                         {activeTab === 'notifications' && <NotificationSettings />}
                         {activeTab === 'data' && <DataManagementSettings />}
+                        {activeTab === 'qr-tools' && <QRToolsSettings onShowQR={(data, title) => {
+                            setQrData({ data, title });
+                            setShowQRDisplay(true);
+                        }} />}
                     </div>
                 </div>
             </div>
