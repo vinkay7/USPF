@@ -145,8 +145,8 @@ const ProfileSettings = ({ user }) => {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-1">Profile Information</h3>
                     <p className="text-slate-600 dark:text-slate-400 text-sm">Update your personal information and account details</p>
@@ -155,7 +155,7 @@ const ProfileSettings = ({ user }) => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={exportProfileData}
-                    className="neumorphic-button px-4 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg flex items-center space-x-2"
+                    className="neumorphic-button px-4 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg flex items-center justify-center space-x-2 w-full sm:w-auto"
                 >
                     <Download className="w-4 h-4" />
                     <span>Export Profile</span>
@@ -163,8 +163,8 @@ const ProfileSettings = ({ user }) => {
             </div>
 
             {/* Profile Picture */}
-            <div className="neumorphic-inset p-6 rounded-xl bg-slate-50/50 dark:bg-slate-700/50">
-                <div className="flex items-center space-x-6">
+            <div className="neumorphic-inset p-4 md:p-6 rounded-xl bg-slate-50/50 dark:bg-slate-700/50">
+                <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
                     <div className="relative">
                         <div className="w-20 h-20 neumorphic bg-slate-200 dark:bg-slate-600 rounded-full flex items-center justify-center overflow-hidden">
                             {profileImage ? (
@@ -180,7 +180,7 @@ const ProfileSettings = ({ user }) => {
                             <Camera className="w-4 h-4" />
                         </button>
                     </div>
-                    <div>
+                    <div className="text-center sm:text-left">
                         <h4 className="font-medium text-slate-900 dark:text-white">Profile Picture</h4>
                         <p className="text-slate-600 dark:text-slate-400 text-sm mb-2">Upload a new avatar for your account</p>
                         <input
@@ -202,7 +202,7 @@ const ProfileSettings = ({ user }) => {
             </div>
 
             {/* Form Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Full Name</label>
                     <input
@@ -257,7 +257,7 @@ const ProfileSettings = ({ user }) => {
                     </select>
                 </div>
 
-                <div>
+                <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Role</label>
                     <input
                         type="text"
@@ -269,12 +269,13 @@ const ProfileSettings = ({ user }) => {
                 </div>
             </div>
 
-            <div className="flex justify-end">
+            {/* Mobile-Optimized Save Button */}
+            <div className="flex justify-center sm:justify-end pt-4 border-t border-slate-200 dark:border-slate-700 mt-6">
                 <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleSave}
-                    className="neumorphic-button px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl flex items-center space-x-2"
+                    className="neumorphic-button px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl flex items-center space-x-2 w-full sm:w-auto justify-center"
                 >
                     <Save className="w-4 h-4" />
                     <span>Save Changes</span>
