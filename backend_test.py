@@ -636,7 +636,7 @@ class USPFInventoryAPITest(unittest.TestCase):
         
         num_requests = 30  # Adjust based on the rate limit in the server
         
-        def make_request():
+        def make_request(_):
             try:
                 response = requests.get(f"{API_URL}/inventory", headers=self.get_auth_headers())
                 return response.status_code
