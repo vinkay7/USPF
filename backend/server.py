@@ -938,26 +938,29 @@ app.include_router(api_router)
 async def startup_event():
     """Initialize services on startup"""
     try:
-        logger.info("Starting USPF Inventory Management System", startup={
+        logger.info("Starting USPF Inventory Management System", extra={
             "version": "2.0.0",
             "environment": os.environ.get("ENVIRONMENT", "development"),
             "jwt_configured": bool(JWT_SECRET_KEY),
-            "supabase_configured": bool(SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY)
+            "supabase_configured": bool(SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY),
+            "utils_available": UTILS_AVAILABLE
         })
         
-        # Initialize database connection
-        db_initialized = await db_manager.initialize()
-        if not db_initialized:
-            logger.warning("Database initialization failed - running in degraded mode")
+        # Initialize database connection only if utils are available
+        if UTILS_AVAILABLE:
+            db_initialized = await db_manager.initialize()
+            if not db_initialized:
+                logger.warning("Database initialization failed - running in degraded mode")
+        else:
+            logger.info("Running in simplified mode without full database utilities")
         
-        logger.info("System startup completed", startup_status={
-            "database_initialized": db_initialized,
-            "health_monitor_active": True
-        })
+        logger.info("System startup completed")
         
     except Exception as e:
-        logger.critical(f"Startup failed: {str(e)}", exc_info=True)
-        raise
+        logger.critical(f"Startup failed: {str(e)}")
+        # Don't raise in Vercel to prevent crashes
+        if os.environ.get("ENVIRONMENT") != "production":
+            raise
 
 @app.on_event("shutdown")
 async def shutdown_event():
