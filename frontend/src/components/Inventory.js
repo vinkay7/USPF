@@ -459,6 +459,7 @@ const Inventory = () => {
                     unit_cost: selectedItem.unit_cost,
                     department: selectedItem.department
                 } : null}
+                qrCodeImage={selectedItem?.qr_code}
                 title={`QR Code - ${selectedItem?.name || 'Item'}`}
             />
 
