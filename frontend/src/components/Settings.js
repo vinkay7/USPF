@@ -92,6 +92,7 @@ const Settings = () => {
                     setQrData(null);
                 }}
                 data={qrData?.data}
+                qrCodeImage={qrData?.qrCodeImage}
                 title={qrData?.title || "QR Code"}
             />
         </Layout>
