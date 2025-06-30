@@ -29,6 +29,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [showQRScanner, setShowQRScanner] = useState(false);
 
     const API_BASE = process.env.REACT_APP_BACKEND_URL + '/api';
 
