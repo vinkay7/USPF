@@ -25,19 +25,20 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # Import custom utilities
-from utils import (
-    logger, 
-    monitor_performance,
-    ErrorHandler,
-    db_manager,
-    with_database_retry,
-    health_monitor,
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from utils.logger import logger, monitor_performance
+from utils.error_handler import ErrorHandler, graceful_shutdown
+from utils.database import db_manager, with_database_retry
+from utils.health_monitor import health_monitor
+from utils.middleware import (
     RequestLoggingMiddleware,
     TimeoutMiddleware,
     SecurityHeadersMiddleware,
     RateLimitMiddleware,
-    MemoryMonitoringMiddleware,
-    graceful_shutdown
+    MemoryMonitoringMiddleware
 )
 
 # JWT Configuration
