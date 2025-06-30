@@ -135,19 +135,19 @@ const Inventory = () => {
 
     return (
         <Layout currentPage="inventory">
-            <div className="space-y-6 h-full overflow-hidden flex flex-col">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="space-y-6">
+                {/* Header Section */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-4xl font-bold gradient-text mb-2">Inventory Management</h1>
-                        <p className="text-slate-600 dark:text-slate-300">Manage your inventory items and track stock levels</p>
+                        <p className="text-slate-600 dark:text-slate-300">Track and manage your inventory items</p>
                     </div>
-                    <div className="flex items-center space-x-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => setShowQRScanner(true)}
-                            className="neumorphic-button px-4 py-2 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-xl flex items-center space-x-2"
+                            className="neumorphic-button px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg flex items-center justify-center space-x-2"
                         >
                             <QrCode className="w-4 h-4" />
                             <span>Scan QR</span>
@@ -156,7 +156,7 @@ const Inventory = () => {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => setShowAddModal(true)}
-                            className="neumorphic-button px-4 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl flex items-center space-x-2"
+                            className="neumorphic-button px-4 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg flex items-center justify-center space-x-2"
                         >
                             <Plus className="w-4 h-4" />
                             <span>Add Item</span>
@@ -164,25 +164,25 @@ const Inventory = () => {
                     </div>
                 </div>
 
-                {/* Search and Filter Bar */}
-                <div className="floating-card p-4">
+                {/* Search and Filters */}
+                <div className="floating-card p-4 md:p-6">
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 relative">
-                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <input
                                 type="text"
-                                placeholder="Search inventory items..."
+                                placeholder="Search items..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 neumorphic-inset bg-slate-50/50 dark:bg-slate-700/50 rounded-xl border-0 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
+                                className="w-full pl-10 pr-4 py-3 neumorphic-inset bg-slate-50/50 dark:bg-slate-700/50 rounded-xl border-0 text-slate-800 dark:text-white placeholder-slate-500 focus:outline-none"
                             />
                         </div>
                         <div className="relative">
-                            <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <select
                                 value={selectedCategory}
                                 onChange={(e) => setSelectedCategory(e.target.value)}
-                                className="pl-12 pr-8 py-3 neumorphic-inset bg-slate-50/50 dark:bg-slate-700/50 rounded-xl border-0 text-slate-800 dark:text-white focus:outline-none appearance-none cursor-pointer"
+                                className="pl-10 pr-8 py-3 neumorphic-inset bg-slate-50/50 dark:bg-slate-700/50 rounded-xl border-0 text-slate-800 dark:text-white focus:outline-none appearance-none cursor-pointer min-w-[150px]"
                             >
                                 {categories.map(category => (
                                     <option key={category} value={category}>
@@ -194,57 +194,24 @@ const Inventory = () => {
                     </div>
                 </div>
 
-                {/* Inventory Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="floating-card p-4">
-                        <div className="flex items-center space-x-3">
-                            <div className="w-12 h-12 neumorphic bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center">
-                                <Package className="w-6 h-6 text-blue-600" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white">{filteredItems.length}</p>
-                                <p className="text-sm text-slate-600 dark:text-slate-400">Total Items</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="floating-card p-4">
-                        <div className="flex items-center space-x-3">
-                            <div className="w-12 h-12 neumorphic bg-orange-50 dark:bg-orange-900/20 rounded-xl flex items-center justify-center">
-                                <AlertTriangle className="w-6 h-6 text-orange-600" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                                    {filteredItems.filter(item => item.quantity <= item.reorder_level).length}
-                                </p>
-                                <p className="text-sm text-slate-600 dark:text-slate-400">Low Stock</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="floating-card p-4">
-                        <div className="flex items-center space-x-3">
-                            <div className="w-12 h-12 neumorphic bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center">
-                                <TrendingUp className="w-6 h-6 text-green-600" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                                    ₦{filteredItems.reduce((total, item) => total + (item.quantity * item.unit_cost), 0).toLocaleString()}
-                                </p>
-                                <p className="text-sm text-slate-600 dark:text-slate-400">Total Value</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Inventory Table */}
-                <div className="floating-card flex-1 overflow-hidden">
-                    <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-                        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Inventory Items</h2>
+                <div className="floating-card overflow-hidden">
+                    {/* Mobile-friendly header */}
+                    <div className="p-4 md:p-6 border-b border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Inventory Items</h3>
+                            <span className="text-sm text-slate-500 dark:text-slate-400">
+                                {filteredItems.length} items
+                            </span>
+                        </div>
                     </div>
-                    <div className="overflow-auto h-full">
+
+                    {/* Desktop Table View */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-slate-50 dark:bg-slate-800/50 sticky top-0">
+                            <thead className="bg-slate-50 dark:bg-slate-800/50">
                                 <tr>
-                                    <th className="text-left py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300">Item</th>
+                                    <th className="text-left py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300">Item Details</th>
                                     <th className="text-left py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300">Category</th>
                                     <th className="text-left py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300">Quantity</th>
                                     <th className="text-left py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300">Unit Cost</th>
@@ -331,6 +298,99 @@ const Inventory = () => {
                                 })}
                             </tbody>
                         </table>
+                        {filteredItems.length === 0 && (
+                            <div className="text-center py-12">
+                                <Package className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                                <p className="text-slate-500 dark:text-slate-400">No inventory items found</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Mobile Card View */}
+                    <div className="md:hidden">
+                        <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                            {filteredItems.map((item, index) => {
+                                const stockStatus = getStockStatus(item.quantity, item.reorder_level);
+                                return (
+                                    <motion.div
+                                        key={item.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        className="p-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
+                                    >
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-medium text-slate-900 dark:text-white truncate">{item.name}</h4>
+                                                <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{item.description}</p>
+                                            </div>
+                                            <span className={`ml-2 inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                                                stockStatus.color === 'red' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
+                                                stockStatus.color === 'orange' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' :
+                                                'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                                            }`}>
+                                                {stockStatus.status}
+                                            </span>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-3 gap-4 mb-3">
+                                            <div>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400">Category</p>
+                                                <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
+                                                    {item.category}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400">Quantity</p>
+                                                <p className="text-sm font-medium text-slate-900 dark:text-white">{item.quantity}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400">Unit Cost</p>
+                                                <p className="text-sm font-medium text-slate-900 dark:text-white">₦{item.unit_cost.toLocaleString()}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-2">
+                                                <motion.button
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                    onClick={() => handleViewBinCard(item)}
+                                                    className="neumorphic p-2 rounded-lg text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                                                    title="View BIN Card"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                </motion.button>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                    onClick={() => {
+                                                        setSelectedItem(item);
+                                                        setShowEditModal(true);
+                                                    }}
+                                                    className="neumorphic p-2 rounded-lg text-green-600 hover:text-green-800 dark:text-green-400"
+                                                    title="Edit Item"
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </motion.button>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                    onClick={() => {
+                                                        setSelectedItem(item);
+                                                        setShowQRModal(true);
+                                                    }}
+                                                    className="neumorphic p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                                                    title="Show QR Code"
+                                                >
+                                                    <QrCode className="w-4 h-4" />
+                                                </motion.button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
                         {filteredItems.length === 0 && (
                             <div className="text-center py-12">
                                 <Package className="w-12 h-12 text-slate-400 mx-auto mb-4" />
