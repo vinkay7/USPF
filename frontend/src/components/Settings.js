@@ -30,7 +30,8 @@ const Settings = () => {
         { id: 'profile', name: 'Profile', icon: User },
         { id: 'system', name: 'System', icon: SettingsIcon },
         { id: 'notifications', name: 'Notifications', icon: Bell },
-        { id: 'data', name: 'Data Management', icon: Database }
+        { id: 'data', name: 'Data Management', icon: Database },
+        { id: 'qr-tools', name: 'QR Tools', icon: QrCode }
     ];
 
     return (
