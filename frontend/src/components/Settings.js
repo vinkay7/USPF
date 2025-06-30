@@ -23,6 +23,8 @@ const Settings = () => {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('profile');
     const [isLoading, setIsLoading] = useState(false);
+    const [showQRDisplay, setShowQRDisplay] = useState(false);
+    const [qrData, setQrData] = useState(null);
 
     const tabs = [
         { id: 'profile', name: 'Profile', icon: User },
