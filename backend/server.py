@@ -264,28 +264,46 @@ async def login(request: LoginRequest):
     try:
         # Hardcoded uspf credentials as requested
         if request.username == "uspf" and request.password == "uspf":
-            # Create a simple token (in production, use proper JWT)
-            token = "uspf-token"
-            
+            # User data for token payload
             user_data = {
-                "id": "uspf-001",
+                "user_id": "uspf-001",
                 "username": "uspf",
                 "role": "admin",
                 "department": "secretariat",
                 "full_name": "USPF Administrator"
             }
             
+            # Create tokens
+            access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            access_token = create_access_token(
+                data={"sub": request.username, **user_data},
+                expires_delta=access_token_expires
+            )
+            
+            refresh_token = create_refresh_token(
+                data={"sub": request.username, **user_data}
+            )
+            
+            logger.info(f"Successful login for user: {request.username}")
+            
             return LoginResponse(
                 success=True,
-                token=token,
+                access_token=access_token,
+                refresh_token=refresh_token,
+                token_type="bearer",
+                expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
                 user=user_data,
                 message="Login successful"
             )
         else:
+            logger.warning(f"Failed login attempt for username: {request.username}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid username or password"
+                detail="Invalid username or password",
+                headers={"WWW-Authenticate": "Bearer"},
             )
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Login error: {str(e)}")
         raise HTTPException(
