@@ -1,171 +1,169 @@
 # USPF Inventory Management - Vercel Deployment Guide
 
-## Project Overview
-This is a full-stack USPF Inventory Management PWA with:
-- **Frontend**: React PWA with modern UI
-- **Backend**: FastAPI serverless functions 
-- **Database**: Supabase (already configured)
+## 🚀 **Complete Vercel Deployment Instructions**
 
-## Pre-Deployment Checklist
+Your application has been updated with a robust JWT authentication system to fix the intermittent login issues. Follow these steps to deploy to Vercel:
 
-### 1. Environment Variables Required in Vercel
-Set these environment variables in your Vercel dashboard:
+---
 
-```
-SUPABASE_URL=https://auagpzfzeslimlrbrtga.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1YWdwemZ6ZXNsaW1scmJydGdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3NjI0MTUsImV4cCI6MjA2NjMzODQxNX0.Pqkd2CywPTSwxWHBxZwNpeePCVZwDlIu6nNT6dFrZNk
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1YWdwemZ6ZXNsaW1scmJydGdhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDc2MjQxNSwiZXhwIjoyMDY2MzM4NDE1fQ.WlQ9-c9CGseHyhQto8v1y81hw9JNGKlsjjdj9n1gbMY
-```
+## **📋 Prerequisites**
+1. Vercel account
+2. Git repository connected to Vercel
+3. The Supabase credentials from your `.env` files
 
-### 2. Repository Structure
-```
-/
-├── api/                    # Serverless API functions
-│   ├── models.py          # Shared models and utilities
-│   ├── requirements.txt   # Python dependencies
-│   ├── auth/
-│   │   ├── login.py      # Login endpoint
-│   │   └── me.py         # User info endpoint
-│   ├── inventory/
-│   │   ├── index.py      # Get inventory
-│   │   ├── create.py     # Create inventory item
-│   │   └── [item_id]/
-│   │       └── bin-card.py # BIN card history
-│   ├── requisitions/
-│   │   └── index.py      # Requisitions endpoints
-│   ├── dashboard/
-│   │   └── stats.py      # Dashboard statistics
-│   ├── reports/
-│   │   └── low-stock.py  # Low stock report
-│   └── health.py         # Health check
-├── frontend/              # React PWA
-│   ├── public/
-│   │   ├── index.html    # Updated for PWA
-│   │   └── manifest.json # PWA manifest  
-│   ├── src/              # React components
-│   └── package.json      # With vercel-build script
-└── vercel.json           # Vercel configuration
+---
 
-```
+## **🔧 Step 1: Set Up Environment Variables in Vercel**
 
-## Deployment Steps
+In your Vercel dashboard, go to your project settings and add these environment variables:
 
-### Method 1: Vercel CLI (Recommended)
-
-1. **Install Vercel CLI**
-   ```bash
-   npm i -g vercel
-   ```
-
-2. **Login to Vercel**
-   ```bash
-   vercel login
-   ```
-
-3. **Deploy from project root**
-   ```bash
-   vercel --prod
-   ```
-
-4. **Set Environment Variables**
-   ```bash
-   vercel env add SUPABASE_URL
-   vercel env add SUPABASE_ANON_KEY  
-   vercel env add SUPABASE_SERVICE_ROLE_KEY
-   ```
-
-### Method 2: Git Integration
-
-1. **Push to GitHub/GitLab**
-   ```bash
-   git add .
-   git commit -m "Prepare for Vercel deployment"
-   git push origin main
-   ```
-
-2. **Connect Repository in Vercel Dashboard**
-   - Go to https://vercel.com/dashboard
-   - Click "New Project"
-   - Import your repository
-   - Set framework preset to "Other"
-   - Set build command to `cd frontend && yarn build`
-   - Set output directory to `frontend/build`
-
-3. **Configure Environment Variables**
-   - In project settings, add the environment variables listed above
-
-## API Endpoints Available
-
-Once deployed, your API will be available at:
-
-- `POST /api/auth/login` - User authentication
-- `GET /api/auth/me` - Get current user  
-- `GET /api/inventory` - Get all inventory items
-- `POST /api/inventory` - Create inventory item
-- `GET /api/inventory/{id}/bin-card` - Get BIN card history
-- `GET /api/requisitions` - Get requisitions
-- `GET /api/dashboard/stats` - Dashboard statistics
-- `GET /api/reports/low-stock` - Low stock items
-- `GET /api/health` - Health check
-
-## Frontend Features
-
-- ✅ PWA Configuration (manifest.json)
-- ✅ Responsive Design with Tailwind CSS
-- ✅ Authentication System
-- ✅ Role-based Access Control
-- ✅ Inventory Management UI
-- ✅ QR Code Scanner Integration
-- ✅ Requisition Management
-- ✅ Dashboard with Analytics
-- ✅ Offline Support Ready
-
-## Default Login Credentials
-
-```
-Username: admin
-Password: admin
-```
-
-## Troubleshooting
-
-### Common Issues:
-
-1. **API Not Working**
-   - Check environment variables are set correctly
-   - Verify API routes follow `/api/*` pattern
-
-2. **Build Failures**
-   - Ensure `frontend/package.json` has correct dependencies
-   - Check Python requirements in `api/requirements.txt`
-
-3. **CORS Issues**
-   - CORS is configured in each API function
-   - Check if frontend is making requests to correct endpoints
-
-### Vercel Logs
+### **Required Environment Variables:**
 ```bash
-vercel logs --follow
+# JWT Authentication
+JWT_SECRET_KEY=uspf-inventory-jwt-secret-key-2025-production-secure
+
+# Supabase Configuration  
+SUPABASE_URL=https://auagpzfzeslimlrbrtga.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1YWdwemZ6ZXNsaW1scmJydGdhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDc2MjQxNSwiZXhwIjoyMDY2MzM4NDE1fQ.WlQ9-c9CGseHyhQto8v1y81hw9JNGKlsjjdj9n1gbMY
+
+# Frontend Environment Variables
+REACT_APP_SUPABASE_URL=https://auagpzfzeslimlrbrtga.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1YWdwemZ6ZXNsaW1scmJydGdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3NjI0MTUsImV4cCI6MjA2NjMzODQxNX0.Pqkd2CywPTSwxWHBxZwNpeePCVZwDlIu6nNT6dFrZNk
+
+# Build Configuration
+GENERATE_SOURCEMAP=false
+CI=false
+BABEL_ENV=production
 ```
 
-## Post-Deployment
+---
 
-1. **Test the application**
-   - Visit your Vercel URL
-   - Test login with admin/admin
-   - Verify API endpoints work
-   - Test PWA installation
+## **🎯 Step 2: Update Frontend Environment**
 
-2. **Custom Domain (Optional)**
-   - Add custom domain in Vercel dashboard
-   - Update DNS records as instructed
+**IMPORTANT:** You need to update the `REACT_APP_BACKEND_URL` in your frontend `.env` file to point to your Vercel deployment URL.
 
-## Performance Optimizations
+1. After deploying, get your Vercel app URL (e.g., `https://your-app-name.vercel.app`)
+2. Update `/frontend/.env` file:
+```bash
+REACT_APP_BACKEND_URL=https://your-app-name.vercel.app
+```
 
-- ✅ Serverless functions for automatic scaling
-- ✅ CDN distribution via Vercel
-- ✅ Static asset optimization
-- ✅ PWA caching strategies
-- ✅ Code splitting in React
+---
 
-Your USPF Inventory Management System is now ready for production deployment on Vercel!
+## **🚀 Step 3: Deploy to Vercel**
+
+### **Option A: Using Vercel CLI**
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Login to Vercel
+vercel login
+
+# Deploy from your project root
+vercel
+
+# Follow the prompts:
+# - Set up and deploy? Yes
+# - Which scope? Your account
+# - Link to existing project? No (or Yes if you have one)
+# - Project name: uspf-inventory-management
+# - Directory: ./ (root)
+```
+
+### **Option B: Using Git Integration**
+1. Push your code to GitHub/GitLab/Bitbucket
+2. Import project in Vercel dashboard
+3. Configure build settings:
+   - **Build Command:** `cd frontend && GENERATE_SOURCEMAP=false yarn install && yarn build`
+   - **Output Directory:** `frontend/build`
+   - **Install Command:** `cd frontend && yarn install`
+
+---
+
+## **⚙️ Step 4: Configure Build Settings**
+
+Ensure your `vercel.json` is configured correctly (already done):
+```json
+{
+  "version": 2,
+  "buildCommand": "cd frontend && GENERATE_SOURCEMAP=false yarn install && yarn build",
+  "outputDirectory": "frontend/build",
+  "installCommand": "cd frontend && yarn install"
+}
+```
+
+---
+
+## **🔍 Step 5: Test Your Deployment**
+
+After deployment:
+
+1. **Test Login:** Go to `https://your-app-name.vercel.app`
+2. **Use Credentials:** Username: `uspf`, Password: `uspf`  
+3. **Verify Features:**
+   - Login authentication
+   - Dashboard loading
+   - Inventory management
+   - Token refresh (automatic)
+
+---
+
+## **🛠️ Step 6: Monitor and Debug**
+
+### **Check Vercel Function Logs:**
+1. Go to Vercel Dashboard → Your Project → Functions
+2. Click on any API function to see logs
+3. Monitor for any authentication or API errors
+
+### **Test API Endpoints:**
+- `https://your-app-name.vercel.app/api/health`
+- `https://your-app-name.vercel.app/api/auth/login`
+- `https://your-app-name.vercel.app/api/inventory`
+
+---
+
+## **🔧 Troubleshooting**
+
+### **If Login Still Fails:**
+1. Check Vercel environment variables are set correctly
+2. Verify JWT_SECRET_KEY is the same across all functions
+3. Check function logs for authentication errors
+4. Ensure CORS headers are properly set
+
+### **If API Calls Fail:**
+1. Check Network tab in browser developer tools
+2. Verify `REACT_APP_BACKEND_URL` points to your Vercel domain
+3. Check API function logs in Vercel dashboard
+
+---
+
+## **✅ What's New in This Version**
+
+### **Fixed Intermittent Login Issues:**
+- ✅ **Proper JWT tokens** with 30-minute expiry
+- ✅ **Automatic token refresh** before expiration
+- ✅ **Retry logic** for failed network requests
+- ✅ **Enhanced error handling** for serverless environments
+- ✅ **Robust session management** for Vercel deployments
+
+### **JWT Authentication Benefits:**
+- No more static tokens that can become inconsistent
+- Automatic recovery from network timeouts
+- Proper token expiration and renewal
+- Better debugging with comprehensive logging
+
+---
+
+## **🎉 Ready to Deploy!**
+
+Your application is now ready for Vercel deployment with the enhanced JWT authentication system that will resolve the intermittent login issues you were experiencing.
+
+**Next Steps:**
+1. Set up environment variables in Vercel
+2. Deploy using one of the methods above
+3. Update the frontend backend URL
+4. Test the login functionality
+5. Monitor the deployment for any issues
+
+The new authentication system should provide a much more stable login experience on Vercel! 🚀
