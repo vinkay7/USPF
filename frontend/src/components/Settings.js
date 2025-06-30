@@ -10,10 +10,12 @@ import {
     Save,
     Building,
     Camera,
-    X
+    X,
+    QrCode
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Layout from './Layout';
+import QRCodeDisplay from './QRCodeDisplay';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
