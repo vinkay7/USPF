@@ -485,7 +485,7 @@ const NotificationSettings = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 pb-6">
             <div>
                 <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-1">Notification Preferences</h3>
                 <p className="text-slate-600 dark:text-slate-400 text-sm">Choose what notifications you want to receive</p>
@@ -515,12 +515,13 @@ const NotificationSettings = () => {
                 ))}
             </div>
 
-            <div className="flex justify-end">
+            {/* Mobile-Optimized Save Button */}
+            <div className="flex justify-center sm:justify-end pt-4 border-t border-slate-200 dark:border-slate-700 mt-6">
                 <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleSave}
-                    className="neumorphic-button px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl flex items-center space-x-2"
+                    className="neumorphic-button px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl flex items-center space-x-2 w-full sm:w-auto justify-center"
                 >
                     <Save className="w-4 h-4" />
                     <span>Save Preferences</span>
