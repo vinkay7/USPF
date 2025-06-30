@@ -83,6 +83,17 @@ const Settings = () => {
                     </div>
                 </div>
             </div>
+
+            {/* QR Code Display Modal */}
+            <QRCodeDisplay
+                isOpen={showQRDisplay}
+                onClose={() => {
+                    setShowQRDisplay(false);
+                    setQrData(null);
+                }}
+                data={qrData?.data}
+                title={qrData?.title || "QR Code"}
+            />
         </Layout>
     );
 };
